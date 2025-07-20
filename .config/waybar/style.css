@@ -8,7 +8,7 @@
   min-height: 0;
 }
 
-#submap {
+#mode {
   padding: 0 12px;
   color: red;
 }
@@ -26,7 +26,7 @@ window#waybar {
   background: rgba(0, 0, 0, 0.2);
 }
 
-#workspaces button.active {
+#workspaces button.focused {
   background: white;
   color: black;
 }
