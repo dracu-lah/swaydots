@@ -78,7 +78,9 @@ exec swayidle -w \
   input type:keyboard {
     repeat_rate 50
   }
-#
+ input type:touch {
+    events disabled
+  }
 
 
 ### Key bindings
