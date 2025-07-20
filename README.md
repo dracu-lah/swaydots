@@ -33,11 +33,11 @@ cd yay && makepkg -si
 ```bash
 sudo pacman -S --needed \
   bluez blueman brightnessctl cliphist fd firefox fzf grim  \
-  kitty ly mpv nemo nwg-look pipewire pipewire-alsa \
+  ly mpv nemo nwg-look pipewire pipewire-alsa \
   pipewire-audio pipewire-jack pipewire-pulse playerctl ripgrep slurp \
   tmux tlp ttf-font-awesome ttf-jetbrains-mono-nerd waybar \
   wf-recorder wireplumber wl-clipboard wofi \
-  stow zsh
+  stow zsh foot
 ```
 
 ---
