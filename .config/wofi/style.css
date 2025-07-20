@@ -1,0 +1,48 @@
+window {
+  /* margin: 5px; */
+  /* border: 1px solid white; */
+  background-color: black;
+}
+
+#input {
+  margin: 5px;
+  border: 2px solid black;
+  color: white;
+  background-color: black;
+  border-radius: 0px;
+}
+
+#input:focus {
+  border: 1px solid #1a1a1d;
+}
+
+#inner-box {
+  margin: 0px;
+  border: 2px solid black;
+  background-color: black;
+}
+
+#outer-box {
+  /* margin: 5px; */
+  /* border: 2px solid green; */
+  /* background-color: green; */
+}
+
+#scroll {
+  margin: 5px;
+  border: 2px solid black;
+  /* background-color: black; */
+}
+
+#text {
+  margin: 5px;
+  /* border: 2px solid cyan; */
+  /* background-color: cyan; */
+}
+#entry:selected {
+  background-color: white;
+}
+#text:selected {
+  background-color: white;
+  color: black;
+}

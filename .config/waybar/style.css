@@ -1,0 +1,86 @@
+* {
+  /* General */
+  border: none;
+  border-radius: 0;
+  font-family: "JetBrainsMono Nerd Font", monospace;
+  font-size: 15px;
+  padding: 1px;
+  min-height: 0;
+}
+
+#submap {
+  padding: 0 12px;
+  color: red;
+}
+window#waybar {
+  background-color: black;
+}
+
+#workspaces button {
+  padding: 0 5px;
+  background-color: transparent;
+  color: #ffffff;
+}
+
+#workspaces button:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+#workspaces button.active {
+  background: white;
+  color: black;
+}
+
+#workspaces button.urgent {
+  background-color: #eb4d4b;
+}
+
+@keyframes blink {
+  to {
+    color: #ffffff;
+  }
+}
+
+#pulseaudio,
+#pulseaudio.microphone,
+#network,
+#cpu,
+#memory,
+#temperature,
+#clock,
+#tray {
+  padding: 0 10px;
+  margin: 0 3px;
+  color: #ffffff;
+}
+
+#temperature.critical {
+  color: #ffffff;
+  animation: critical-blink 1s linear infinite alternate;
+}
+
+@keyframes critical-blink {
+  to {
+    color: #ff0000;
+  }
+}
+/* Default style for the module (e.g., when not recording) */
+#custom-wf-recorder-status {
+  padding: 0 8px; /* Adjust padding as needed */
+  color: #61afef; /* Blue color for stopped (matches script) */
+}
+
+/* Style when wf-recorder is active */
+#custom-wf-recorder-status.recording {
+  color: #e06c75; /* Red color for recording (matches script) */
+  animation: pulse 1s infinite alternate; /* Optional: Add a subtle pulse effect */
+}
+
+@keyframes pulse {
+  from {
+    opacity: 0.8;
+  }
+  to {
+    opacity: 1;
+  }
+}

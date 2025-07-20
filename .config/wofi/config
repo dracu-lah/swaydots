@@ -1,0 +1,2 @@
+dmenu-pre_display_cmd=cliphist-wofi-img %s
+dmenu-allow_images=true
