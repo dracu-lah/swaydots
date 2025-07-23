@@ -82,7 +82,7 @@
         	"format-plugged": "󱐌 {capacity}%",
         	"format-alt": "{time} {icon}",
         	"format-full": "󰠠 {capacity}%",
-        	"format-icons": ["", "", ""],
+        	"format-icons": ["󰁺", "󰁻", "󰁼","󰁽","󰁾","󰁿","󰂀","󰂁","󰂂","󰁹"],
     "interval": 1
 	},
   "custom/wf-recorder-status": {
