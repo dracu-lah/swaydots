@@ -41,6 +41,7 @@ window#waybar {
   }
 }
 
+#idle_inhibitor,
 #pulseaudio,
 #pulseaudio.microphone,
 #network,

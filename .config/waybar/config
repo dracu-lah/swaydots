@@ -7,6 +7,7 @@
   "modules-left": ["sway/workspaces","sway/mode"],
   "modules-center": [],
   "modules-right": [
+  "idle_inhibitor",
     "pulseaudio",
     "network",
     "cpu",
@@ -17,6 +18,13 @@
     "tray",
     "custom/wf-recorder-status"
   ],
+"idle_inhibitor": {
+    "format": "{icon}",
+    "format-icons": {
+        "activated": "",
+        "deactivated": ""
+    }
+},
 
   "pulseaudio": {
     "format": " {icon}  {volume}%  {format_source} ",
