@@ -1,0 +1,5 @@
+.config/pulse
+.config/dconf
+.config/lazygit
+.config/nvim
+.config/mimeapps.list
