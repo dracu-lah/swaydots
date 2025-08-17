@@ -62,8 +62,8 @@ yay -S waylogout-git neovim-git wifi-qr
 ## Apply Dotfiles
 
 ```bash
-git clone https://github.com/dracu-lah/dotfiles ~/dotfiles
-cd ~/dotfiles
+git clone https://github.com/dracu-lah/swaydots
+cd ~/swaydots
 stow .
 ```
 
