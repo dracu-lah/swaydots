@@ -32,7 +32,7 @@ cd yay && makepkg -si
 
 ```bash
 sudo pacman -S --needed \
-  bluez blueman brightnessctl cliphist fd firefox fzf grim  \
+  bluez blueman dunst alacritty brightnessctl cliphist fd firefox fzf grim  \
   ly mpv nemo nwg-look pipewire pipewire-alsa \
   pipewire-audio pipewire-jack pipewire-pulse playerctl ripgrep slurp \
   tmux tlp ttf-font-awesome ttf-jetbrains-mono-nerd waybar \
@@ -54,7 +54,7 @@ sudo pacman -S --needed sway swaylock swaybg swayidle
 ## Install AUR Packages
 
 ```bash
-yay -S waylogout-git neovim-git wifi-qr
+yay -S waylogout-git neovim-git wifi-qr zen-browser
 ```
 
 ---
