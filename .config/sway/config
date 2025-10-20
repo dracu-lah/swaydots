@@ -21,8 +21,8 @@ set $up k
 set $right l
 
 
-set $term kitty
-set $browser firefox
+set $term alacritty
+set $browser zen-browser
 set $file-manager nemo
 set $menu wofi --show drun
 set $lock_bg  ~/wallpapers/wallpaper.jpg
@@ -260,7 +260,6 @@ bindsym $mod+x exec waylogout \
 	--hide-cancel \
 	--screenshots \
 	--font="JetBrainsMono Nerd Font 1" \
-	--fa-font="Font Awesome 6 Free" \
 	--effect-blur=7x5 \
 	--indicator-thickness=20 \
 	--ring-color=888888aa \
@@ -308,23 +307,11 @@ for_window [app_id="zenity"] floating enable;
 
 # Autolaunch
 exec {
-  copyq
+  # copyq
+  /home/dracu/.config/sway/scripts/dark-mode.sh
   wl-paste --type text --watch cliphist store
   wl-paste --type image --watch cliphist store
 }
 
-# Set dark theme for GTK applications
-set $gnome-schema org.gnome.desktop.interface
-exec_always gsettings set $gnome-schema gtk-theme 'Adwaita-dark'
-exec_always gsettings set $gnome-schema icon-theme 'Adwaita'
-exec_always gsettings set $gnome-schema cursor-theme 'Adwaita'
-exec_always gsettings set $gnome-schema color-scheme 'prefer-dark'
-
-# Set dark theme for QT applications
-exec_always export QT_STYLE_OVERRIDE=Adwaita-Dark
-exec_always export QT_QPA_PLATFORMTHEME=qt5ct  # or gtk3
-
-# Environment variables for dark mode
-exec_always export GTK_THEME=Adwaita-dark
 include /etc/sway/config.d/*
 
