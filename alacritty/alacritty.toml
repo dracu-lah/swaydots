@@ -1,0 +1,30 @@
+# Alacritty Configuration
+
+# Window settings
+[window]
+padding.x = 10
+padding.y = 10
+decorations = "full" # or "none", "buttonless"
+opacity = 1.0
+
+# Font settings
+[font]
+normal.family = "JetbrainsMonoNerdFont" # Replace with your preferred monospace font
+normal.style = "Regular"
+size = 14
+
+# Color scheme
+[colors.primary]
+background = "#000000" # Black
+foreground = "#FFFFFF" # White
+
+# Cursor colors
+[colors.cursor]
+text = "#000000" # Black
+cursor = "#FFFFFF" # White
+
+# Selection colors
+[colors.selection]
+text = "#000000" # White
+background = "#FFFFFF" # Black
+
