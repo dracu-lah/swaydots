@@ -2,15 +2,16 @@
 
 A minimal and functional Sway desktop setup for Arch-based distributions.
 
+![Preview](og-image.png)
+
 ### Table of Contents
 
 - [AUR Helper (yay)](#aur-helper-yay)
 - [Install Sway & Essential Packages](#install-sway--essential-packages)
 - [Install AUR Packages](#install-aur-packages)
 - [Apply Dotfiles](#apply-dotfiles)
-- [ZSH with ZimFW](#zsh-with-zimfw)
 - [Neovim with LazyVim](#neovim-with-lazyvim)
-- [NVM & PNPM Setup](#nvm--pnpm-setup)
+- [PNPM Setup](#pnpm-setup)
 - [Git Setup](#git-setup)
 - [Docker Setup](#docker-setup)
 - [QEMU/KVM Virtualization](#qemukvm-virtualization)
@@ -28,25 +29,20 @@ cd yay && makepkg -si
 
 ---
 
-## Install Essential Packages
+## Install Sway & Essential Packages
 
 ```bash
+# Install Sway
+sudo pacman -S --needed sway swaylock swaybg swayidle
+
+# Install essential packages
 sudo pacman -S --needed \
-  bluez blueman dunst alacritty brightnessctl cliphist fd firefox fzf grim  \
+  bluez blueman dunst alacritty brightnessctl cliphist fd firefox fzf grim \
   ly mpv nemo nwg-look pipewire pipewire-alsa \
   pipewire-audio pipewire-jack pipewire-pulse playerctl ripgrep slurp \
   tmux tlp ttf-font-awesome ttf-jetbrains-mono-nerd waybar \
   wf-recorder wireplumber wl-clipboard wofi \
-  stow zsh foot pamixer
-```
-
----
-
-## Install Sway
-
-```bash
-sudo pacman -S --needed sway swaylock swaybg swayidle
-
+  stow fish foot pamixer
 ```
 
 ---
@@ -54,7 +50,7 @@ sudo pacman -S --needed sway swaylock swaybg swayidle
 ## Install AUR Packages
 
 ```bash
-yay -S waylogout-git neovim-git wifi-qr zen-browser
+yay -S waylogout-git neovim-git wifi-qr zen-browser nodejs-lts-jod
 ```
 
 ---
@@ -63,19 +59,8 @@ yay -S waylogout-git neovim-git wifi-qr zen-browser
 
 ```bash
 git clone https://github.com/dracu-lah/swaydots
-cd ~/swaydots
+cd swaydots
 stow .
-```
-
----
-
-## ZSH with ZimFW
-
-[zimfw.sh](https://zimfw.sh/)
-
-```bash
-chsh -s /bin/zsh
-curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh
 ```
 
 ---
@@ -93,12 +78,9 @@ nvim
 
 ---
 
-## NVM & PNPM Setup
-
-[nvm-sh](https://github.com/nvm-sh/nvm)
+## PNPM Setup
 
 ```bash
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
 curl -fsSL https://get.pnpm.io/install.sh | sh -
 ```
 
@@ -174,11 +156,4 @@ Enable TLP:
 
 ```bash
 sudo systemctl enable --now tlp.service
-```
-
-Auto suspend on low battery:
-in /etc/udev/rules.d/99-lowbat.rules
-
-```bash
-SUBSYSTEM=="power_supply", ATTR{status}=="Discharging", ATTR{capacity}=="[0-5]", RUN+="/usr/bin/systemctl suspend"
 ```
