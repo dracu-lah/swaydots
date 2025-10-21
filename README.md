@@ -113,7 +113,7 @@ newgrp docker
 
 ---
 
-## QEMU/KVM Virtualization
+## QEMU/KVM Virtualization (Optional)
 
 [christitus.com](https://christitus.com/setup-qemu-in-archlinux/)
 
