@@ -34,8 +34,8 @@ include /etc/sway/config-vars.d/*
 # General Settings
 floating_modifier $mod normal
 default_border pixel 1
-gaps inner 5
-gaps outer 5
+gaps inner 0
+gaps outer 0
 
 smart_gaps on
 hide_edge_borders smart
