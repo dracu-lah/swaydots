@@ -2,8 +2,8 @@
 
 # Window settings
 [window]
-padding.x = 10
-padding.y = 10
+padding.x = 5
+padding.y = 5
 decorations = "full" # or "none", "buttonless"
 opacity = 1.0
 
