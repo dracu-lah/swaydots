@@ -50,7 +50,7 @@ sudo pacman -S --needed \
 ## Install AUR Packages
 
 ```bash
-yay -S waylogout-git neovim-git wifi-qr zen-browser nodejs-lts-jod
+yay -S waylogout-git neovim-git wifi-qr zen-browser nodejs-lts-jod wl-color-picker
 ```
 
 ---

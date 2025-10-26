@@ -105,6 +105,10 @@ exec swayidle -w \
     # Kill focused window
     bindsym $mod+c kill
 
+ 
+    bindsym Alt+c exec wl-color-picker clipboard
+
+
     # Start your launcher
     bindsym $mod+d exec $menu
 
