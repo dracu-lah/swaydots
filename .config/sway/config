@@ -308,7 +308,6 @@ for_window [title="File Operation Progress"] floating enable;
 for_window [title="zbar barcode reader"] floating enable;
 for_window [app_id="zenity"] floating enable;
 
-
 # Autolaunch
 exec {
   # copyq
@@ -316,6 +315,5 @@ exec {
   wl-paste --type text --watch cliphist store
   wl-paste --type image --watch cliphist store
 }
-
 include /etc/sway/config.d/*
 
