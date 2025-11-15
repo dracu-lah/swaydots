@@ -3,7 +3,7 @@ services:
     image: mysql:8.0
     container_name: mysql-db-personal
     environment:
-      MYSQL_ROOT_PASSWORD: dracu
+      MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: testdb
       MYSQL_USER: dracu
       MYSQL_PASSWORD: dracu
