@@ -1,0 +1,39 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: postgres_db_personal
+    restart: always
+    environment:
+      POSTGRES_USER: dracu
+      POSTGRES_PASSWORD: dracu
+      POSTGRES_DB: dracudb
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data_personal:/var/lib/postgresql/data
+    networks:
+      - pg_network_personal
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin_ui_personal
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: nevilnicks4321@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: Nevil@9207
+    ports:
+      - "8081:80"
+    volumes:
+      - pgadmin_data_personal:/var/lib/pgadmin
+    networks:
+      - pg_network_personal
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data_personal:
+  pgadmin_data_personal:
+
+networks:
+  pg_network_personal:
+    driver: bridge
