@@ -25,8 +25,8 @@ set $term alacritty
 set $browser zen-browser
 set $file-manager nemo
 set $menu wofi --show drun
-set $lock_bg  ~/wallpapers/wallpaper.jpg
-set $screen_bg ~/wallpapers/wallpaper.jpg
+set $lock_bg  ~/wallpapers/wallpaper-2.jpg
+set $screen_bg ~/wallpapers/wallpaper-2.jpg
 
 include /etc/sway/config-vars.d/*
 
