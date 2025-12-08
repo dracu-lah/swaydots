@@ -42,7 +42,7 @@ sudo pacman -S --needed \
   pipewire-audio pipewire-jack pipewire-pulse playerctl ripgrep slurp \
   tmux tlp ttf-font-awesome ttf-jetbrains-mono-nerd waybar \
   wf-recorder wireplumber wl-clipboard wofi \
-  stow fish foot pamixer gnome-terminal chromium
+  stow fish foot pamixer gnome-terminal chromium lazygit
 ```
 
 ---
@@ -50,7 +50,7 @@ sudo pacman -S --needed \
 ## Install AUR Packages
 
 ```bash
-yay -S waylogout-git neovim-git wifi-qr zen-browser nodejs-lts-jod \
+yay -S waylogout-git neovim-git wifi-qr zen-browser-bin nodejs-lts-jod \
   wl-color-picker dragon-drop
 ```
 
