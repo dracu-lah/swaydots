@@ -42,7 +42,8 @@ sudo pacman -S --needed \
   pipewire-audio pipewire-jack pipewire-pulse playerctl ripgrep slurp \
   tmux tlp ttf-font-awesome ttf-jetbrains-mono-nerd waybar \
   wf-recorder wireplumber wl-clipboard wofi \
-  stow fish foot pamixer gnome-terminal chromium lazygit
+  stow fish foot pamixer gnome-terminal chromium lazygit \
+  xdg-desktop-portal-wlr xdg-desktop-portal
 ```
 
 ---
