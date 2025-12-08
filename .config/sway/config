@@ -312,8 +312,10 @@ for_window [app_id="zenity"] floating enable;
 exec {
   # copyq
   # /home/dracu/.config/sway/scripts/dark-mode.sh
+  blueman-applet
   wl-paste --type text --watch cliphist store
   wl-paste --type image --watch cliphist store
 }
+
 include /etc/sway/config.d/*
 
