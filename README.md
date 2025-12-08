@@ -52,7 +52,7 @@ sudo pacman -S --needed \
 
 ```bash
 yay -S waylogout-git neovim-git wifi-qr zen-browser-bin nodejs-lts-jod \
-  wl-color-picker dragon-drop
+  wl-color-picker dragon-drop dracula-gtk-theme dracula-icons-theme  dracula-cursors-git
 ```
 
 ---

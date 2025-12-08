@@ -311,7 +311,7 @@ for_window [app_id="zenity"] floating enable;
 # Autolaunch
 exec {
   # copyq
-  /home/dracu/.config/sway/scripts/dark-mode.sh
+  # /home/dracu/.config/sway/scripts/dark-mode.sh
   wl-paste --type text --watch cliphist store
   wl-paste --type image --watch cliphist store
 }
