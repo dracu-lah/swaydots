@@ -99,6 +99,9 @@ gaps outer 0
 smart_gaps on
 hide_edge_borders smart
 
+# Popups and Dialogs
+popup_during_fullscreen smart
+
 # Colors                 border  bg      text    indicator child_border
 client.focused           #ffffff #ffffff #000000 #fc2d2d
 client.unfocused         #000000 #000000 #ffffff
@@ -184,6 +187,9 @@ exec swayidle -w \
     bindsym $mod+Shift+e exec 'swaymsg exit'
 
 ## --- Navigation --- ##
+    # Workspace Back-and-Forth
+    workspace_auto_back_and_forth yes
+
     # Focus (vim style)
     bindsym $mod+$left focus left
     bindsym $mod+$down focus down
@@ -283,6 +289,8 @@ for_window [title="zbar barcode reader"] floating enable; # wifi-qr
 for_window [app_id="zenity"] floating enable;
 for_window [app_id="imv"] floating enable;
 for_window [app_id="blueman-manager"] floating enable;
+for_window [app_id="pavucontrol"] floating enable;
+
 
 
 ### ==============================================================================
@@ -299,6 +307,18 @@ bar {
 ### ==============================================================================
 
 exec {
+  # DBus & Systemd Environment Update
+  dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
+
+  # Polkit Authentication Agent
+  /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
+
+  # Network Manager Applet
+  nm-applet --indicator
+
+  # Night Light / Blue Light Filter
+  gammastep
+
   blueman-applet
   wl-paste --type text --watch cliphist store
   wl-paste --type image --watch cliphist store
