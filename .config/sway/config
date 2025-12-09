@@ -316,9 +316,6 @@ exec {
   # Network Manager Applet
   nm-applet --indicator
 
-  # Night Light / Blue Light Filter
-  wlsunset
-
   blueman-applet
   wl-paste --type text --watch cliphist store
   wl-paste --type image --watch cliphist store

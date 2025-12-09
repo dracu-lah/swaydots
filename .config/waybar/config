@@ -27,8 +27,8 @@
   ],
   "custom/night_light": {
       "format": "{}",
-      "exec": "~/.config/sway/scripts/toggle_night_light.sh status",
-      "on-click": "~/.config/sway/scripts/toggle_night_light.sh toggle",
+      "exec": "~/.config/waybar/scripts/toggle_night_light.sh status",
+      "on-click": "~/.config/waybar/scripts/toggle_night_light.sh toggle",
       "interval": 1,
       "tooltip-format": "Night Light: {alt}",
       "class": "night-light" 
