@@ -281,6 +281,12 @@ bindsym $mod+x exec waylogout \
 	--selection-label
 
 
+# Disable laptop screen on lid close
+bindswitch --locked --reload lid:on output eDP-1 disable
+
+# Enable laptop screen on lid open
+bindswitch --locked --reload lid:off output eDP-1 enable
+
 #
 # Status Bar:
 #
