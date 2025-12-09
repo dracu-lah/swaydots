@@ -317,7 +317,7 @@ exec {
   nm-applet --indicator
 
   # Night Light / Blue Light Filter
-  gammastep
+  wlsunset
 
   blueman-applet
   wl-paste --type text --watch cliphist store

@@ -11,6 +11,7 @@
 
   ],
   "modules-right": [
+    "custom/night_light",
     "idle_inhibitor",
     "pulseaudio",
 
@@ -24,6 +25,14 @@
     "tray",
     "custom/wf-recorder-status"
   ],
+  "custom/night_light": {
+      "format": "{}",
+      "exec": "~/.config/sway/scripts/toggle_night_light.sh status",
+      "on-click": "~/.config/sway/scripts/toggle_night_light.sh toggle",
+      "interval": 1,
+      "tooltip-format": "Night Light: {alt}",
+      "class": "night-light" 
+  },
   "idle_inhibitor": {
     "format": "{icon}",
     "format-icons": {
