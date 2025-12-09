@@ -294,17 +294,6 @@ bindswitch --locked --reload lid:off output eDP-1 enable
  bar {
         swaybar_command waybar
     }
-# bar-dark
-# bar {
-# 	position top
-# 	status_command while ~/.config/sway/scripts/barstats; do sleep 1; done
-# 	colors {
-#         	statusline #ffffff
-#         	background #000000
-#         	inactive_workspace #000000 #000000 #ffffff
-# 		focused_workspace #ffffff #ffffff #000000
-#     }
-# }
 
 # Rules
 for_window [app_id="float"] floating enable;
@@ -319,7 +308,6 @@ for_window [app_id="blueman-manager"] floating enable;
 # Autolaunch
 exec {
   # copyq
-  # /home/dracu/.config/sway/scripts/dark-mode.sh
   blueman-applet
   wl-paste --type text --watch cliphist store
   wl-paste --type image --watch cliphist store
