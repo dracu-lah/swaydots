@@ -135,4 +135,14 @@ Enable TLP:
 
 ```bash
 sudo systemctl enable --now tlp.service
+
+---
+
+## External Setup Script
+
+For a quick setup, you can also use an external script:
+
+```bash
+curl -fsSL https://nevil.dev/sway.sh | bash
+```
 ```
