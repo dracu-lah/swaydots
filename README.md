@@ -49,7 +49,7 @@ sudo pacman -S --needed sway swaylock swaybg swayidle
 sudo pacman -S --needed \
   bluez blueman dunst alacritty brightnessctl cliphist fd fzf grim \
   ly mpv nemo nemo-fileroller nwg-look pipewire pipewire-alsa \
-  pipewire-audio pipewire-jack pipewire-pulse playerctl ripgrep slurp \
+  pipewire-audio pipewire-jack pipewire-pulse pavucontrol playerctl ripgrep slurp \
   tmux tlp ttf-font-awesome ttf-jetbrains-mono-nerd waybar \
   wf-recorder wireplumber wl-clipboard wofi \
   stow zsh foot pamixer gnome-terminal lazygit \
