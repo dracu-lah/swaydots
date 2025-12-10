@@ -37,7 +37,7 @@ sudo pacman -S --needed sway swaylock swaybg swayidle
 
 # Install essential packages
 sudo pacman -S --needed \
-  bluez blueman dunst alacritty brightnessctl cliphist fd firefox fzf grim \
+  bluez blueman dunst alacritty brightnessctl cliphist fd fzf grim \
   ly mpv nemo nemo-fileroller nwg-look pipewire pipewire-alsa \
   pipewire-audio pipewire-jack pipewire-pulse playerctl ripgrep slurp \
   tmux tlp ttf-font-awesome ttf-jetbrains-mono-nerd waybar \
@@ -52,8 +52,8 @@ sudo pacman -S --needed \
 
 ```bash
 yay -S waylogout-git neovim-git wifi-qr zen-browser-bin nodejs-lts-jod \
-  wl-color-picker dragon-drop dracula-gtk-theme dracula-icons-theme  dracula-cursors-git \
-   nemo-preview material-black-colors-theme
+  wl-color-picker dragon-drop \
+  nemo-preview material-black-colors-theme mint-y-icons
 ```
 
 ---
