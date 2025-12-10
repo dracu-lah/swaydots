@@ -39,12 +39,19 @@ yay -S --needed --noconfirm \
 
 # 4. Apply Dotfiles
 echo "Applying dotfiles..."
-# Ensure we are in the correct directory (optional check)
-if [ -f "setup.sh" ]; then
-  stow .
-else
-  echo "Warning: Not running from the dotfiles root or setup.sh not found in current dir. Skipping stow."
+DOTFILES_DIR="$HOME/swaydots"
+REPO_URL="https://github.com/dracu-lah/swaydots.git"
+
+if [ ! -d "$DOTFILES_DIR" ]; then
+  echo "Cloning $REPO_URL to $DOTFILES_DIR..."
+  git clone "$REPO_URL" "$DOTFILES_DIR"
 fi
+
+echo "Changing directory to $DOTFILES_DIR..."
+cd "$DOTFILES_DIR"
+
+echo "Stowing dotfiles..."
+stow .
 
 # 5. Zimfw
 echo "Installing Zimfw..."
