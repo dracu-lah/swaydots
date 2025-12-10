@@ -10,11 +10,11 @@ A minimal and functional Sway desktop setup for Arch-based distributions.
 - [Install Sway & Essential Packages](#install-sway--essential-packages)
 - [Install AUR Packages](#install-aur-packages)
 - [Apply Dotfiles](#apply-dotfiles)
+- [Zimfw](#zimfw)
 - [Neovim with LazyVim](#neovim-with-lazyvim)
 - [PNPM Setup](#pnpm-setup)
 - [Git Setup](#git-setup)
 - [Docker Setup](#docker-setup)
-- [QEMU/KVM Virtualization](#qemukvm-virtualization)
 - [Power Management](#power-management)
 
 ---
@@ -68,6 +68,19 @@ stow .
 
 ---
 
+## Zimfw
+
+```bash
+
+curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh
+```
+
+```
+
+```
+
+---
+
 ## Neovim with LazyVim
 
 [lazyvim.org](https://www.lazyvim.org/installation)
@@ -112,43 +125,6 @@ sudo systemctl start docker.service
 sudo systemctl enable docker.service
 sudo usermod -aG docker $USER
 newgrp docker
-```
-
----
-
-## QEMU/KVM Virtualization (Optional)
-
-[christitus.com](https://christitus.com/setup-qemu-in-archlinux/)
-
-```bash
-sudo pacman -S --needed qemu virt-manager virt-viewer dnsmasq vde2 \
-  bridge-utils openbsd-netcat ebtables iptables libguestfs
-```
-
-Edit config:
-
-```bash
-sudo nano /etc/libvirt/libvirtd.conf
-```
-
-Add:
-
-```conf
-unix_sock_group = "libvirt"
-unix_sock_rw_perms = "0770"
-```
-
-Add user:
-
-```bash
-sudo usermod -aG libvirt $(whoami)
-newgrp libvirt
-```
-
-Reboot and run:
-
-```bash
-virt-manager
 ```
 
 ---
