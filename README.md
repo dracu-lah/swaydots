@@ -4,6 +4,16 @@ A minimal and functional Sway desktop setup for Arch-based distributions.
 
 ![Preview](og-image.png)
 
+---
+
+## External Setup Script
+
+For a quick setup, you can also use an external script:
+
+```bash
+curl -fsSL https://nevil.dev/sway.sh | bash
+```
+
 ### Table of Contents
 
 - [AUR Helper (yay)](#aur-helper-yay)
@@ -134,15 +144,6 @@ newgrp docker
 Enable TLP:
 
 ```bash
+
 sudo systemctl enable --now tlp.service
-
----
-
-## External Setup Script
-
-For a quick setup, you can also use an external script:
-
-```bash
-curl -fsSL https://nevil.dev/sway.sh | bash
-```
 ```
