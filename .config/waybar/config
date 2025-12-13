@@ -5,7 +5,8 @@
   "spacing": 5,
 
   "modules-left": [
-    "sway/workspaces", "sway/mode",
+    "sway/workspaces", 
+    "sway/mode"
   ],
   "modules-center": [
 

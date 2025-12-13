@@ -42,10 +42,10 @@ include /etc/sway/config-vars.d/*
 ### ==============================================================================
 
 # External monitor (left)
-output HDMI-A-2 resolution 1920x1080 position 0,0
+output HDMI-A-1 resolution 1920x1080@60hz position 0,0
 
 # Built-in monitor (right of external)
-output eDP-1 resolution 1920x1080 position 1920,0
+output eDP-1 resolution 1920x1080@60hz position 1920,0
 
 # Wallpaper
 output * bg $screen_bg fill
@@ -62,7 +62,7 @@ bindswitch --locked --reload lid:off output eDP-1 enable
 ### ==============================================================================
 
 # Touchpad settings
-input "1739:0:Synaptics_TM3276-022" {
+input "1267:12410:ELAN1203:00_04F3:307A_Touchpad" {
     dwt enabled
     tap enabled
     natural_scroll enabled
@@ -307,8 +307,6 @@ bar {
 ### ==============================================================================
 
 exec {
-  # DBus & Systemd Environment Update
-  dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
 
   # Polkit Authentication Agent
   /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
@@ -316,7 +314,6 @@ exec {
   # Network Manager Applet
   nm-applet --indicator
 
-  blueman-applet
   wl-paste --type text --watch cliphist store
   wl-paste --type image --watch cliphist store
 }
