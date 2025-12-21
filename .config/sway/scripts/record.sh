@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # --- Configuration ---
-audio_source="alsa_input.pci-0000_00_1f.3.analog-stereo.monitor"
+audio_source=$(pactl get-default-source)
 # Use a specific output directory for recordings
 output_dir="$HOME/Videos/SwayRecordings"
 mkdir -p "$output_dir"
