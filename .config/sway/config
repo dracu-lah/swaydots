@@ -62,7 +62,7 @@ bindswitch --locked --reload lid:off output eDP-1 enable
 ### ==============================================================================
 
 # Touchpad settings
-input "1739:0:Synaptics_TM3276-022" {
+input type:touchpad {
     dwt enabled
     tap enabled
     natural_scroll enabled
@@ -76,14 +76,6 @@ input type:keyboard {
     repeat_rate 50
 }
 
-# Touchscreen settings
-input type:touch {
-    events disabled
-}
-
-input "1:1:AT_Translated_Set_2_keyboard" {
-    events disabled
-}
 
 
 ### ==============================================================================

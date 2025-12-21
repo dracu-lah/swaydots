@@ -1,7 +1,7 @@
 Move files to systemd dir
 
 ```bash
-sudo mv  ~/hyprdots/.config/kmonad/*.service /etc/systemd/system/
+sudo mv  ~/swaydots/.config/kmonad/*.service /etc/systemd/system/
 ```
 
 Enable them
