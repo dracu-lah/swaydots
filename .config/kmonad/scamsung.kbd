@@ -5,12 +5,12 @@
 )
 
 (defsrc
-  f11   caps   lsft
+  f11   caps   lsft   del   ins
 )
 
 
 
 (deflayer default
-  XX    lsft   caps
+  XX    lsft   caps   XX   del
 )
 
