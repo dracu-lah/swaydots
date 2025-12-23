@@ -41,11 +41,11 @@ include /etc/sway/config-vars.d/*
 ### Output Configuration
 ### ==============================================================================
 
-# External monitor (left)
-output HDMI-A-1 resolution 1920x1080 position 0,0
+# External monitor (right)
+output HDMI-A-1 resolution 1920x1080 position 1920,0
 
 # Built-in monitor (right of external)
-output eDP-1 resolution 1920x1080 position 1920,0
+output eDP-1 resolution 1920x1080 position 0,0
 
 # Wallpaper
 output * bg $screen_bg fill
