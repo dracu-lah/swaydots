@@ -25,6 +25,7 @@ curl -fsSL https://nevil.dev/sway.sh | bash
 - [PNPM Setup](#pnpm-setup)
 - [Git Setup](#git-setup)
 - [Docker Setup](#docker-setup)
+- [Autologin & Auto-start Sway](#autologin--auto-start-sway)
 - [Power Management](#power-management)
 
 ---
@@ -139,11 +140,54 @@ newgrp docker
 
 ---
 
-## Power Management
+## Autologin & Auto-start Sway
 
-Enable TLP:
+Automatically log in and start Sway on boot.
+
+### 1. TTY Autologin Service
+
+Create an override file for `getty@tty1`:
 
 ```bash
+sudo mkdir -p /etc/systemd/system/getty@tty1.service.d
+sudo vim /etc/systemd/system/getty@tty1.service.d/override.conf
+```
 
+Paste the following content (replace `username` with your actual username):
+
+```ini
+[Service]
+ExecStart=
+ExecStart=-/sbin/agetty -o '-p -- \\u' --noclear --autologin username %I $TERM
+```
+
+### 2. Shell Profile Configuration
+
+Add the following to your `~/.zprofile` (if using zsh) or `~/.bash_profile`:
+
+```bash
+# If we are on TTY1 and Sway isn't already running, start it.
+if [ -z "$DISPLAY" ] && [ "$XDG_VTNR" -eq 1 ]; then
+  exec sway
+fi
+```
+
+---
+
+## Power Management
+
+Install and enable power optimization tools (`tlp`, `powertop`, `thermald`):
+
+```bash
+# Install packages
+sudo pacman -S --needed tlp powertop thermald
+
+# Enable TLP (Power management)
 sudo systemctl enable --now tlp.service
+
+# Enable Thermald (Thermal management)
+sudo systemctl enable --now thermald.service
+
+# Apply Powertop auto-tune (Consider creating a systemd service for persistence)
+sudo powertop --auto-tune
 ```
