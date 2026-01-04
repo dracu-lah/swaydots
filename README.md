@@ -53,7 +53,7 @@ sudo pacman -S --needed \
   tmux tlp ttf-font-awesome ttf-jetbrains-mono-nerd waybar \
   wf-recorder wireplumber wl-clipboard wofi \
   stow zsh foot pamixer gnome-terminal lazygit \
-  xdg-desktop-portal-wlr xdg-desktop-portal imv polkit-gnome wlsunset wlr-randr
+  xdg-desktop-portal-wlr xdg-desktop-portal imv polkit-gnome wlsunset wlr-randr kdenlive fastfetch btop
 ```
 
 ---
@@ -61,7 +61,7 @@ sudo pacman -S --needed \
 ## Install AUR Packages
 
 ```bash
-yay -S waylogout-git neovim-git wifi-qr zen-browser-bin nodejs-lts-jod \
+yay -S waylogout-git neovim-git wifi-qr zen-browser-bin nodejs-lts-jod npm \
   wl-color-picker dragon-drop \
   nemo-preview material-black-colors-theme mint-y-icons
 ```
