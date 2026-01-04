@@ -176,14 +176,15 @@ fi
 
 ## Power Management
 
-Install and enable power optimization tools (`tlp`, `powertop`, `thermald`):
+Install and enable power optimization tools (`auto-cpufreq`, `powertop`, `thermald`):
 
 ```bash
 # Install packages
-sudo pacman -S --needed tlp powertop thermald
+sudo pacman -S --needed powertop thermald
+yay -S --needed auto-cpufreq
 
-# Enable TLP (Power management)
-sudo systemctl enable --now tlp.service
+# Enable auto cpu freq for newer systems
+sudo auto-cpufreq --install
 
 # Enable Thermald (Thermal management)
 sudo systemctl enable --now thermald.service
