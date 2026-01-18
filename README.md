@@ -191,4 +191,5 @@ sudo systemctl enable --now thermald.service
 
 # Apply Powertop auto-tune (Consider creating a systemd service for persistence)
 sudo powertop --auto-tune
+
 ```
