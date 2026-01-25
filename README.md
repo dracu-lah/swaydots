@@ -54,7 +54,8 @@ sudo pacman -S --needed \
   tmux tlp ttf-font-awesome ttf-jetbrains-mono-nerd waybar \
   wf-recorder wireplumber wl-clipboard wofi \
   stow zsh foot pamixer gnome-terminal lazygit \
-  xdg-desktop-portal-wlr xdg-desktop-portal imv polkit-gnome wlsunset wlr-randr kdenlive fastfetch btop telegram-desktop
+  xdg-desktop-portal-wlr xdg-desktop-portal imv polkit-gnome wlsunset wlr-randr kdenlive fastfetch btop telegram-desktop xorg-server-xwayland
+
 ```
 
 ---

@@ -290,8 +290,10 @@ for_window [app_id="zenity"] floating enable;
 for_window [app_id="imv"] floating enable;
 for_window [app_id="blueman-manager"] floating enable;
 for_window [app_id="pavucontrol"] floating enable;
+for_window [shell=".*"] title_format "%title - %shell"
+for_window [shell="xwayland"] title_format "%title [xwayland]"
 
-
+xwayland enable
 
 ### ==============================================================================
 ### Status Bar
@@ -319,6 +321,7 @@ exec {
   blueman-applet
   wl-paste --type text --watch cliphist store
   wl-paste --type image --watch cliphist store
+  eval $(gnome-keyring-daemon --start)
 }
 
 # Final system includes
