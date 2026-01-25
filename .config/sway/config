@@ -42,10 +42,10 @@ include /etc/sway/config-vars.d/*
 ### ==============================================================================
 
 # External monitor (left)
-output HDMI-A-2 resolution 1920x1080@60Hz position 0,0
+output HDMI-A-1 resolution 1920x1080@60hz position 0,0
 
 # Built-in monitor (right of external)
-output eDP-1 resolution 1920x1080@60Hz position 1920,0
+output eDP-1 resolution 1920x1080@60hz position 1920,0
 
 # Wallpaper
 output * bg $screen_bg fill
@@ -290,8 +290,10 @@ for_window [app_id="zenity"] floating enable;
 for_window [app_id="imv"] floating enable;
 for_window [app_id="blueman-manager"] floating enable;
 for_window [app_id="pavucontrol"] floating enable;
+for_window [shell=".*"] title_format "%title - %shell"
+for_window [shell="xwayland"] title_format "%title [xwayland]"
 
-
+xwayland enable
 
 ### ==============================================================================
 ### Status Bar
@@ -319,6 +321,7 @@ exec {
   blueman-applet
   wl-paste --type text --watch cliphist store
   wl-paste --type image --watch cliphist store
+  eval $(gnome-keyring-daemon --start)
 }
 
 # Final system includes
