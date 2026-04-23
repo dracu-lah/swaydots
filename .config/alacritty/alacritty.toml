@@ -28,3 +28,8 @@ cursor = "#FFFFFF" # White
 text = "#000000" # White
 background = "#FFFFFF" # Black
 
+
+[[keyboard.bindings]]
+key = "Return"
+mods = "Shift"
+chars = "\u001B\r"
