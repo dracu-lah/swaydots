@@ -28,3 +28,17 @@ cursor = "#FFFFFF" # White
 text = "#000000" # White
 background = "#FFFFFF" # Black
 
+[[keyboard.bindings]]
+key = "Enter"
+mods = "Shift"
+chars = "\u001b[13;2u"
+
+[[keyboard.bindings]]
+key = "Enter"
+mods = "Control"
+chars = "\u001b[13;5u"
+
+[[keyboard.bindings]]
+key = "Enter"
+mods = "Control|Shift"
+chars = "\u001b[13;6u"
