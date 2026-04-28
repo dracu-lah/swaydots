@@ -25,7 +25,7 @@ set $right l
 
 # Applications
 set $term alacritty
-set $browser zen-browser
+set $browser flatpak run app.zen_browser.zen
 set $file-manager nemo
 set $menu wofi --show drun
 
@@ -52,9 +52,8 @@ output eDP-1 resolution 1920x1080@60hz position 1920,0
 output * bg $screen_bg fill
 
 # Laptop Lid Behavior
-# Disable laptop screen on lid close
-bindswitch --locked --reload lid:on output eDP-1 disable
-# Enable laptop screen on lid open
+# On battery: suspend.  On AC: just blank the laptop screen.
+bindswitch --locked --reload lid:on exec ~/.config/sway/scripts/lid.sh
 bindswitch --locked --reload lid:off output eDP-1 enable
 
 
@@ -116,12 +115,9 @@ client.focused_inactive  #000000 #000000 #ffffff
 # Lock screen manually
 bindsym Alt+l exec 'swaylock -i $lock_bg'
 
-# Idle management (screen off after 5m, suspend after 10m)
-exec swayidle -w \
-        timeout 300 'swaymsg "output * dpms off"' \
-        resume 'swaymsg "output * dpms on"' \
-        timeout 600 'systemctl suspend' \
-        before-sleep 'swaylock -f -i $lock_bg'
+# Idle management — battery-aware (aggressive on bat, relaxed on AC).
+# AC:  10m dpms-off, 30m suspend.  Battery: 2m dpms-off, 3m suspend.
+exec ~/.config/sway/scripts/swayidle-watch.sh
 
 
 ### ==============================================================================
@@ -144,15 +140,27 @@ exec swayidle -w \
     bindsym $mod+Shift+v exec /home/dracu/.config/sway/scripts/clipboard.sh
     bindsym $mod+Shift+r exec /home/dracu/.config/sway/scripts/record.sh
 
-    # Volume Control
-    bindsym XF86AudioMute exec pactl set-sink-mute @DEFAULT_SINK@ toggle
-    bindsym XF86AudioRaiseVolume exec pamixer -i 5 && \
-        notify-send Volume -h int:value:$(pactl get-sink-volume @DEFAULT_SINK@ | awk '{print $5}')
-    bindsym XF86AudioLowerVolume exec pamixer -d 5 && \
-        notify-send Volume -h int:value:$(pactl get-sink-volume @DEFAULT_SINK@ | awk '{print $5}')
-    
-    # Mic Mute
-    bindsym XF86AudioMicMute exec pactl set-source-mute @DEFAULT_SOURCE@ toggle
+    # Volume / mute (wpctl follows the active default sink — works for built-in,
+    # 3.5mm jack, USB DAC, and Bluetooth headphones automatically).
+    bindsym XF86AudioRaiseVolume exec wpctl set-volume -l 1.5 @DEFAULT_AUDIO_SINK@ 5%+ && \
+        notify-send -h string:x-canonical-private-synchronous:volume Volume \
+            -h int:value:$(wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{print int($2*100)}')
+    bindsym XF86AudioLowerVolume exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%- && \
+        notify-send -h string:x-canonical-private-synchronous:volume Volume \
+            -h int:value:$(wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{print int($2*100)}')
+    bindsym XF86AudioMute exec wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle && \
+        notify-send -h string:x-canonical-private-synchronous:volume Volume \
+            "$(wpctl get-volume @DEFAULT_AUDIO_SINK@ | grep -q MUTED && echo Muted || echo Unmuted)"
+
+    # Mic mute
+    bindsym XF86AudioMicMute exec wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle && \
+        notify-send -h string:x-canonical-private-synchronous:mic Microphone \
+            "$(wpctl get-volume @DEFAULT_AUDIO_SOURCE@ | grep -q MUTED && echo Muted || echo Unmuted)"
+
+    # Media playback (Spotify, Firefox, mpv, etc.)
+    bindsym XF86AudioPlay exec playerctl play-pause
+    bindsym XF86AudioNext exec playerctl next
+    bindsym XF86AudioPrev exec playerctl previous
 
     # Brightness Control
     bindsym XF86MonBrightnessUp exec brightnessctl s +5% && \
@@ -166,6 +174,7 @@ exec swayidle -w \
         --hide-cancel \
         --screenshots \
         --font="JetBrainsMono Nerd Font 1" \
+        --fa-font="Font Awesome 6 Free" \
         --effect-blur=7x5 \
         --indicator-thickness=20 \
         --ring-color=888888aa \
@@ -291,7 +300,8 @@ for_window [title="zbar barcode reader"] floating enable; # wifi-qr
 for_window [app_id="zenity"] floating enable;
 for_window [app_id="imv"] floating enable;
 for_window [app_id="blueman-manager"] floating enable;
-for_window [app_id="pavucontrol"] floating enable;
+for_window [app_id="pavucontrol"] floating enable
+for_window [app_id="wl-color-picker"] floating enable;
 for_window [shell=".*"] title_format "%title - %shell"
 for_window [shell="xwayland"] title_format "%title [xwayland]"
 for_window [class="scrcpy"] floating enable, sticky enable, resize set 400 800
@@ -316,8 +326,8 @@ exec {
   # DBus & Systemd Environment Update
   dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
 
-  # Polkit Authentication Agent
-  /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
+  # Polkit Authentication Agent (lxqt-policykit on Fedora)
+  /usr/libexec/lxqt-policykit-agent
 
   # Network Manager Applet
   nm-applet --indicator

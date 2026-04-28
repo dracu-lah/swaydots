@@ -1,27 +1,23 @@
 #!/bin/bash
 
-WLSUNSET_PID=$(pgrep wlsunset 2>/dev/null)
+WLSUNSET_PID=$(pgrep -x wlsunset 2>/dev/null)
 
-if [ "$1" == "status" ]; then
-  if [ -z "$WLSUNSET_PID" ]; then
-
-    echo ""
-  else
-
-    echo "󱩍"
-  fi
-  exit 0
-fi
-
-if [ "$1" == "toggle" ]; then
-  if [ -z "$WLSUNSET_PID" ]; then
-    wlsunset -t 4000 6500 &
-  else
-    kill "$WLSUNSET_PID"
-  fi
-  exit 0
-fi
-
-if [ -z "$1" ]; then
-  "$0" status
-fi
+case "$1" in
+  status)
+    if [ -z "$WLSUNSET_PID" ]; then
+      echo "󱩍"
+    else
+      echo "󰛨"
+    fi
+    ;;
+  toggle)
+    if [ -z "$WLSUNSET_PID" ]; then
+      setsid -f wlsunset -t 4000 -T 6500 -S 00:00 -s 00:01 -d 1 </dev/null >/dev/null 2>&1
+    else
+      kill "$WLSUNSET_PID"
+    fi
+    ;;
+  *)
+    "$0" status
+    ;;
+esac
