@@ -31,14 +31,14 @@ background = "#FFFFFF" # Black
 [[keyboard.bindings]]
 key = "Enter"
 mods = "Shift"
-chars = "[13;2u"
+chars = "\u001b[13;2u"
 
 [[keyboard.bindings]]
 key = "Enter"
 mods = "Control"
-chars = "[13;5u"
+chars = "\u001b[13;5u"
 
 [[keyboard.bindings]]
 key = "Enter"
 mods = "Control|Shift"
-chars = "[13;6u"
+chars = "\u001b[13;6u"
