@@ -51,7 +51,7 @@ sudo pacman -S --needed \
   bluez blueman dunst alacritty brightnessctl cliphist fd fzf grim \
   ly mpv nemo nemo-fileroller nwg-look pipewire pipewire-alsa \
   pipewire-audio pipewire-jack pipewire-pulse pavucontrol playerctl ripgrep slurp \
-  tmux tlp ttf-font-awesome ttf-jetbrains-mono-nerd waybar \
+  tmux ttf-font-awesome ttf-jetbrains-mono-nerd waybar \
   wf-recorder wireplumber wl-clipboard wofi \
   stow zsh foot pamixer gnome-terminal lazygit \
   xdg-desktop-portal-wlr xdg-desktop-portal imv polkit-gnome wlsunset wlr-randr kdenlive fastfetch btop telegram-desktop xorg-server-xwayland
@@ -177,20 +177,62 @@ fi
 
 ## Power Management
 
-Install and enable power optimization tools (`auto-cpufreq`, `powertop`, `thermald`):
+Stack: `auto-cpufreq` (CPU governor + charge thresholds) + `thermald` (thermal) + `powertop --auto-tune` (USB/SATA/audio runtime PM). **Do not run `tlp` alongside auto-cpufreq** — they fight over the governor.
 
 ```bash
 # Install packages
 sudo pacman -S --needed powertop thermald
 yay -S --needed auto-cpufreq
 
-# Enable auto cpu freq for newer systems
-sudo auto-cpufreq --install
+# Defensive: ensure TLP can't auto-start if it ever gets pulled in
+sudo systemctl mask tlp.service
 
-# Enable Thermald (Thermal management)
+# Thermald
 sudo systemctl enable --now thermald.service
 
-# Apply Powertop auto-tune (Consider creating a systemd service for persistence)
-sudo powertop --auto-tune
+# Persist powertop --auto-tune across boots via a oneshot unit
+sudo tee /etc/systemd/system/powertop.service >/dev/null <<'EOF'
+[Unit]
+Description=Powertop auto-tune
+After=multi-user.target
 
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/usr/bin/powertop --auto-tune
+
+[Install]
+WantedBy=multi-user.target
+EOF
+sudo systemctl daemon-reload
+sudo systemctl enable --now powertop.service
+
+# Charge thresholds: 50% start / 80% stop (preserves Li-poly cycle life).
+# auto-cpufreq's default is 75/80 — override to 50/80.
+sudo sed -i 's/^start_threshold = 75/start_threshold = 50/g' /etc/auto-cpufreq.conf
+
+# Install auto-cpufreq as a systemd daemon (this is what makes the conf take effect)
+sudo auto-cpufreq --install
+
+# Optional: NOPASSWD sudoers rule so the Super+Shift+P keybind can switch
+# performance/powersave/auto without prompting. Replace `dracu` with your user.
+sudo tee /etc/sudoers.d/auto-cpufreq-force >/dev/null <<EOF
+$USER ALL=(root) NOPASSWD: /usr/local/bin/auto-cpufreq --force=performance
+$USER ALL=(root) NOPASSWD: /usr/local/bin/auto-cpufreq --force=powersave
+$USER ALL=(root) NOPASSWD: /usr/local/bin/auto-cpufreq --force=reset
+EOF
+sudo chmod 0440 /etc/sudoers.d/auto-cpufreq-force
+sudo visudo -cf /etc/sudoers.d/auto-cpufreq-force
 ```
+
+**Verify**:
+
+```bash
+systemctl is-active auto-cpufreq powertop thermald   # all active
+systemctl is-enabled tlp                              # masked
+cat /sys/class/power_supply/BAT0/charge_control_end_threshold   # 80
+```
+
+**Keybinds** (sway):
+- `Super+Shift+P` — cycle power profile (performance / powersave / auto)
+- `Super+Shift+B` — battery health popup (cycles, capacity, threshold, mfg date)

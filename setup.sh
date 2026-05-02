@@ -25,7 +25,7 @@ sudo pacman -S --needed --noconfirm \
   bluez blueman dunst alacritty brightnessctl cliphist fd fzf grim \
   ly mpv nemo nemo-fileroller nwg-look pipewire pipewire-alsa \
   pipewire-audio pipewire-jack pipewire-pulse playerctl ripgrep slurp \
-  tmux tlp ttf-font-awesome ttf-jetbrains-mono-nerd waybar \
+  tmux powertop thermald ttf-font-awesome ttf-jetbrains-mono-nerd waybar \
   wf-recorder wireplumber wl-clipboard wofi \
   stow zsh foot pamixer gnome-terminal lazygit \
   xdg-desktop-portal-wlr xdg-desktop-portal imv polkit-gnome wlsunset wlr-randr
@@ -34,7 +34,7 @@ sudo pacman -S --needed --noconfirm \
 echo "Installing AUR packages..."
 yay -S --needed --noconfirm \
   waylogout-git neovim-git wifi-qr zen-browser-bin nodejs-lts-jod \
-  wl-color-picker dragon-drop \
+  wl-color-picker dragon-drop auto-cpufreq \
   nemo-preview material-black-colors-theme mint-y-icons
 
 # 4. Apply Dotfiles
@@ -129,8 +129,49 @@ sudo systemctl enable docker.service
 sudo usermod -aG docker $USER
 
 # 10. Power Management
-echo "Enabling TLP..."
-sudo systemctl enable --now tlp.service
+# Stack: auto-cpufreq (governor + charge thresholds) + thermald + powertop --auto-tune.
+# TLP is intentionally NOT installed/enabled — it conflicts with auto-cpufreq.
+echo "Configuring power management stack..."
+
+# Defensive: if TLP was previously installed, prevent it from starting.
+sudo systemctl mask tlp.service 2>/dev/null || true
+
+# Thermald
+sudo systemctl enable --now thermald.service
+
+# Persist powertop --auto-tune across boots
+sudo tee /etc/systemd/system/powertop.service >/dev/null <<'EOF'
+[Unit]
+Description=Powertop auto-tune
+After=multi-user.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/usr/bin/powertop --auto-tune
+
+[Install]
+WantedBy=multi-user.target
+EOF
+sudo systemctl daemon-reload
+sudo systemctl enable --now powertop.service
+
+# Override auto-cpufreq default thresholds (75/80) to 50/80 for longer cycle life.
+sudo sed -i 's/^start_threshold = 75/start_threshold = 50/g' /etc/auto-cpufreq.conf
+
+# Install auto-cpufreq as a systemd daemon — this is what makes the conf take effect.
+sudo auto-cpufreq --install
+
+# NOPASSWD sudoers rule for the Super+Shift+P power-profile keybind.
+sudo tee /etc/sudoers.d/auto-cpufreq-force >/dev/null <<EOF
+$USER ALL=(root) NOPASSWD: /usr/local/bin/auto-cpufreq --force=performance
+$USER ALL=(root) NOPASSWD: /usr/local/bin/auto-cpufreq --force=powersave
+$USER ALL=(root) NOPASSWD: /usr/local/bin/auto-cpufreq --force=reset
+EOF
+sudo chmod 0440 /etc/sudoers.d/auto-cpufreq-force
+sudo visudo -cf /etc/sudoers.d/auto-cpufreq-force
+
+# Display manager + graphical target
 sudo systemctl enable ly.service
 sudo systemctl set-default graphical.target
 /usr/lib/xdg-desktop-portal

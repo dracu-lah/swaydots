@@ -42,8 +42,8 @@ include /etc/sway/config-vars.d/*
 ### ==============================================================================
 
 # External monitor (left)
-# output HDMI-A-1 resolution 1920x1080@60hz position 0,0  scale 1.2
-output DP-1   position 0,0  scale 1.4
+output HDMI-A-1 resolution 1920x1080@60hz position 0,0 
+# output DP-1   position 0,0  scale 1.4
 
 # Built-in monitor (right of external)
 output eDP-1 resolution 1920x1080@60hz position 1920,0
@@ -169,6 +169,12 @@ exec ~/.config/sway/scripts/swayidle-watch.sh
     bindsym XF86MonBrightnessDown exec brightnessctl s 5%- && \
         notify-send Brightness -h int:value:$(brightnessctl | awk '/Current/ {print $4}' | tr -d '()')
 
+    # Power profile cycle: powersave -> performance -> auto
+    bindsym $mod+Shift+p exec ~/.config/sway/scripts/power-profile.sh
+
+    # Battery health popup (also fires on click of waybar battery)
+    bindsym $mod+Shift+b exec ~/.config/waybar/scripts/battery-info.sh
+
 ## --- Power Menu --- ##
     bindsym $mod+x exec waylogout \
         --hide-cancel \
@@ -286,8 +292,6 @@ exec ~/.config/sway/scripts/swayidle-watch.sh
         bindsym Escape mode "default"
     }
     bindsym $mod+r mode "resize"
-
-bindswitch lid:on exec systemctl suspend
 
 ### ==============================================================================
 ### Window Rules
