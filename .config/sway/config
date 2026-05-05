@@ -52,7 +52,7 @@ output eDP-1 resolution 1920x1080@60hz position 1920,0
 output * bg $screen_bg fill
 
 # Laptop Lid Behavior
-# On battery: suspend.  On AC: just blank the laptop screen.
+# Hibernate on lid close.
 bindswitch --locked --reload lid:on exec ~/.config/sway/scripts/lid.sh
 bindswitch --locked --reload lid:off output eDP-1 enable
 
@@ -192,7 +192,7 @@ exec ~/.config/sway/scripts/swayidle-watch.sh
         --text-selection-color=eaeaeaaa \
         --line-selection-color=00000000 \
         --logout-command="swaymsg exit" \
-        --suspend-command="systemctl suspend" \
+        --hibernate-command="systemctl hibernate" \
         --poweroff-command="poweroff" \
         --reboot-command="reboot" \
         --selection-label
