@@ -42,3 +42,8 @@ chars = "\u001b[13;5u"
 key = "Enter"
 mods = "Control|Shift"
 chars = "\u001b[13;6u"
+
+[[keyboard.bindings]]
+key = "Return"
+mods = "Shift"
+chars = "\u001B\r"
