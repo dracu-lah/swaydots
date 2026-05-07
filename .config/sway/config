@@ -25,7 +25,7 @@ set $right l
 
 # Applications
 set $term alacritty
-set $browser flatpak run app.zen_browser.zen
+set $browser zen-browser 
 set $file-manager nemo
 set $menu wofi --show drun
 
@@ -180,7 +180,6 @@ exec ~/.config/sway/scripts/swayidle-watch.sh
         --hide-cancel \
         --screenshots \
         --font="JetBrainsMono Nerd Font 1" \
-        --fa-font="Font Awesome 6 Free" \
         --effect-blur=7x5 \
         --indicator-thickness=20 \
         --ring-color=888888aa \
@@ -191,6 +190,10 @@ exec ~/.config/sway/scripts/swayidle-watch.sh
         --inside-selection-color=33cc3366 \
         --text-selection-color=eaeaeaaa \
         --line-selection-color=00000000 \
+        --logout-label="󰍃" \
+        --reboot-label="󰜉" \
+        --poweroff-label="󰐥" \
+        --hibernate-label="󰒲" \
         --logout-command="swaymsg exit" \
         --hibernate-command="systemctl hibernate" \
         --poweroff-command="poweroff" \
