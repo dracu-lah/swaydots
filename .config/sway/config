@@ -179,7 +179,7 @@ exec ~/.config/sway/scripts/swayidle-watch.sh
     bindsym $mod+x exec waylogout \
         --hide-cancel \
         --screenshots \
-        --font="JetBrainsMono Nerd Font 1" \
+        --font="JetBrainsMono Nerd Font 14" \
         --effect-blur=7x5 \
         --indicator-thickness=20 \
         --ring-color=888888aa \
@@ -193,9 +193,7 @@ exec ~/.config/sway/scripts/swayidle-watch.sh
         --logout-label="󰍃" \
         --reboot-label="󰜉" \
         --poweroff-label="󰐥" \
-        --hibernate-label="󰒲" \
         --logout-command="swaymsg exit" \
-        --hibernate-command="systemctl hibernate" \
         --poweroff-command="poweroff" \
         --reboot-command="reboot" \
         --selection-label

@@ -1,7 +1,6 @@
 #!/bin/bash
 # Run swayidle with timeouts based on AC state. Restart on AC change.
-
-LOCK_BG="$HOME/wallpapers/wallpaper.jpg"
+# DPMS-only: no auto-suspend (i915 PSR resume is broken on this hardware).
 
 ac_online() {
     for f in /sys/class/power_supply/*/online; do
@@ -14,19 +13,15 @@ ac_online() {
 
 start() {
     if ac_online; then
-        # AC: relaxed (10 min screen off, 30 min suspend)
+        # AC: 10 min screen off
         swayidle -w \
-            timeout 600  'swaymsg "output * dpms off"' \
-              resume     'swaymsg "output * dpms on"' \
-            timeout 1800 'systemctl suspend' \
-            before-sleep "swaylock -f -i $LOCK_BG" &
+            timeout 600 'swaymsg "output * dpms off"' \
+              resume    'swaymsg "output * dpms on"' &
     else
-        # Battery: aggressive (2 min screen off, 3 min suspend)
+        # Battery: 2 min screen off
         swayidle -w \
             timeout 120 'swaymsg "output * dpms off"' \
-              resume    'swaymsg "output * dpms on"' \
-            timeout 180 'systemctl suspend' \
-            before-sleep "swaylock -f -i $LOCK_BG" &
+              resume    'swaymsg "output * dpms on"' &
     fi
     PID=$!
 }
