@@ -129,8 +129,11 @@ sudo systemctl enable docker.service
 sudo usermod -aG docker $USER
 
 # 10. Power Management
-# Stack: auto-cpufreq (governor + charge thresholds) + thermald + powertop --auto-tune.
+# Stack: auto-cpufreq (governor) + thermald + powertop --auto-tune.
 # TLP is intentionally NOT installed/enabled — it conflicts with auto-cpufreq.
+# Note: charge thresholds are not configurable on Victus 16 — hp_wmi doesn't expose
+# charge_control_end_threshold, and auto-cpufreq's threshold support is hard-wired
+# to ideapad/thinkpad/asus only. No BIOS toggle either.
 echo "Configuring power management stack..."
 
 # Defensive: if TLP was previously installed, prevent it from starting.
@@ -155,9 +158,6 @@ WantedBy=multi-user.target
 EOF
 sudo systemctl daemon-reload
 sudo systemctl enable --now powertop.service
-
-# Override auto-cpufreq default thresholds (75/80) to 50/80 for longer cycle life.
-sudo sed -i 's/^start_threshold = 75/start_threshold = 50/g' /etc/auto-cpufreq.conf
 
 # Install auto-cpufreq as a systemd daemon — this is what makes the conf take effect.
 sudo auto-cpufreq --install

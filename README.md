@@ -177,7 +177,9 @@ fi
 
 ## Power Management
 
-Stack: `auto-cpufreq` (CPU governor + charge thresholds) + `thermald` (thermal) + `powertop --auto-tune` (USB/SATA/audio runtime PM). **Do not run `tlp` alongside auto-cpufreq** — they fight over the governor.
+Stack: `auto-cpufreq` (CPU governor) + `thermald` (thermal) + `powertop --auto-tune` (USB/SATA/audio runtime PM). **Do not run `tlp` alongside auto-cpufreq** — they fight over the governor.
+
+> **Charge thresholds are not available on this laptop.** `hp_wmi` (kernel 6.18) doesn't expose `/sys/class/power_supply/BAT0/charge_control_end_threshold`, and auto-cpufreq's threshold support is hard-wired to `ideapad_acpi`/`ideapad_laptop`/`thinkpad_acpi`/`asus_wmi` only. TLP would hit the same wall. There's no BIOS setting either. Battery will charge to 100%.
 
 ```bash
 # Install packages
@@ -207,10 +209,6 @@ EOF
 sudo systemctl daemon-reload
 sudo systemctl enable --now powertop.service
 
-# Charge thresholds: 50% start / 80% stop (preserves Li-poly cycle life).
-# auto-cpufreq's default is 75/80 — override to 50/80.
-sudo sed -i 's/^start_threshold = 75/start_threshold = 50/g' /etc/auto-cpufreq.conf
-
 # Install auto-cpufreq as a systemd daemon (this is what makes the conf take effect)
 sudo auto-cpufreq --install
 
@@ -230,9 +228,8 @@ sudo visudo -cf /etc/sudoers.d/auto-cpufreq-force
 ```bash
 systemctl is-active auto-cpufreq powertop thermald   # all active
 systemctl is-enabled tlp                              # masked
-cat /sys/class/power_supply/BAT0/charge_control_end_threshold   # 80
 ```
 
 **Keybinds** (sway):
 - `Super+Shift+P` — cycle power profile (performance / powersave / auto)
-- `Super+Shift+B` — battery health popup (cycles, capacity, threshold, mfg date)
+- `Super+Shift+B` — battery health popup (cycles, capacity, mfg date)
