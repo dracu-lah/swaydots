@@ -179,20 +179,30 @@ exec ~/.config/sway/scripts/swayidle-watch.sh
     bindsym $mod+x exec waylogout \
         --hide-cancel \
         --screenshots \
-        --font="JetBrainsMono Nerd Font 14" \
-        --effect-blur=7x5 \
-        --indicator-thickness=20 \
-        --ring-color=888888aa \
-        --inside-color=88888866 \
-        --text-color=eaeaeaaa \
+        --effect-greyscale \
+        --effect-scale=0.5 \
+        --effect-vignette=0.3:0.7 \
+        --font="JetBrainsMono Nerd Font" \
+        --fa-font="JetBrainsMono Nerd Font" \
+        --label-font-size=18 \
+        --symbol-font-size=44 \
+        --indicator-radius=80 \
+        --indicator-thickness=4 \
+        --indicator-separation=40 \
+        --ring-color=4a4a4aff \
+        --inside-color=1a1a1ad9 \
+        --text-color=eaeaeaff \
         --line-color=00000000 \
-        --ring-selection-color=33cc33aa \
-        --inside-selection-color=33cc3366 \
-        --text-selection-color=eaeaeaaa \
+        --ring-selection-color=ff5555ff \
+        --inside-selection-color=2a1414e6 \
+        --text-selection-color=ffffffff \
         --line-selection-color=00000000 \
-        --logout-label="󰍃" \
-        --reboot-label="󰜉" \
-        --poweroff-label="󰐥" \
+        --logout-symbol="󰍃" \
+        --reboot-symbol="󰜉" \
+        --poweroff-symbol="󰐥" \
+        --logout-label="logout" \
+        --reboot-label="reboot" \
+        --poweroff-label="power off" \
         --logout-command="swaymsg exit" \
         --poweroff-command="poweroff" \
         --reboot-command="reboot" \
