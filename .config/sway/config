@@ -184,11 +184,11 @@ exec ~/.config/sway/scripts/swayidle-watch.sh
         --effect-vignette=0.3:0.7 \
         --font="JetBrainsMono Nerd Font" \
         --fa-font="JetBrainsMono Nerd Font" \
-        --label-font-size=18 \
-        --symbol-font-size=44 \
-        --indicator-radius=80 \
+        --label-font-size=16 \
+        --symbol-font-size=30 \
+        --indicator-radius=70 \
         --indicator-thickness=4 \
-        --indicator-separation=40 \
+        --indicator-separation=60 \
         --ring-color=4a4a4aff \
         --inside-color=1a1a1ad9 \
         --text-color=eaeaeaff \
@@ -197,15 +197,15 @@ exec ~/.config/sway/scripts/swayidle-watch.sh
         --inside-selection-color=2a1414e6 \
         --text-selection-color=ffffffff \
         --line-selection-color=00000000 \
-        --logout-symbol="󰍃" \
-        --reboot-symbol="󰜉" \
         --poweroff-symbol="󰐥" \
-        --logout-label="logout" \
-        --reboot-label="reboot" \
         --poweroff-label="power off" \
-        --logout-command="swaymsg exit" \
         --poweroff-command="poweroff" \
+        --reboot-symbol="󰜉" \
+        --reboot-label="reboot" \
         --reboot-command="reboot" \
+        --logout-symbol="󰍃" \
+        --logout-label="logout" \
+        --logout-command="swaymsg exit" \
         --selection-label
 
 ## --- Sway Management --- ##
