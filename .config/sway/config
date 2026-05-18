@@ -25,7 +25,7 @@ set $right l
 
 # Applications
 set $term alacritty
-set $browser zen-browser 
+set $browser flatpak run app.zen_browser.zen
 set $file-manager nemo
 set $menu wofi --show drun
 
