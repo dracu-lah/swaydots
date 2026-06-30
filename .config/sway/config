@@ -46,7 +46,7 @@ output HDMI-A-1 resolution 1920x1080@60hz position 0,0
 # output DP-1   position 0,0  scale 1.4
 
 # Built-in monitor (right of external)
-output eDP-1 resolution 1920x1080@60hz position 1920,0
+output eDP-1 resolution 1920x1080@60hz position 1920,0 scale 1.1
 
 # Wallpaper
 output * bg $screen_bg fill
