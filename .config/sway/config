@@ -46,7 +46,7 @@ output HDMI-A-1 resolution 1920x1080@60hz position 0,0
 # output DP-1   position 0,0  scale 1.4
 
 # Built-in monitor (right of external)
-output eDP-1 resolution 1920x1080@60hz position 1920,0 scale 1.1
+output eDP-1 resolution 1920x1080@60hz position 1920,0
 
 # Wallpaper
 output * bg $screen_bg fill
@@ -185,7 +185,7 @@ exec ~/.config/sway/scripts/swayidle-watch.sh
         --font="JetBrainsMono Nerd Font" \
         --fa-font="JetBrainsMono Nerd Font" \
         --label-font-size=16 \
-        --symbol-font-size=30 \
+        --symbol-font-size=50 \
         --indicator-radius=70 \
         --indicator-thickness=4 \
         --indicator-separation=60 \
