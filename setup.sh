@@ -156,8 +156,13 @@ EOF
 sudo systemctl daemon-reload
 sudo systemctl enable --now powertop.service
 
-# Override auto-cpufreq default thresholds (75/80) to 50/80 for longer cycle life.
-sudo sed -i 's/^start_threshold = 75/start_threshold = 50/g' /etc/auto-cpufreq.conf
+# Tracked configs (see docs/laptop-performance.md): auto-cpufreq profiles and zstd zram.
+sudo install -m 644 "$DOTFILES_DIR/system/etc/auto-cpufreq.conf" /etc/auto-cpufreq.conf
+sudo install -m 644 "$DOTFILES_DIR/system/etc/zram-generator.conf" /etc/systemd/zram-generator.conf
+
+# Dell: auto-cpufreq cannot set charge thresholds; use the BIOS Custom mode (50/80) instead.
+DELL_CHG=/sys/class/firmware-attributes/dell-wmi-sysman/attributes/PrimaryBattChargeCfg/current_value
+[ -e "$DELL_CHG" ] && echo Custom | sudo tee "$DELL_CHG" >/dev/null || true
 
 # Install auto-cpufreq as a systemd daemon — this is what makes the conf take effect.
 sudo auto-cpufreq --install

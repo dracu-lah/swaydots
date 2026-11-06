@@ -207,9 +207,12 @@ EOF
 sudo systemctl daemon-reload
 sudo systemctl enable --now powertop.service
 
-# Charge thresholds: 50% start / 80% stop (preserves Li-poly cycle life).
-# auto-cpufreq's default is 75/80 — override to 50/80.
-sudo sed -i 's/^start_threshold = 75/start_threshold = 50/g' /etc/auto-cpufreq.conf
+# Tracked auto-cpufreq profiles + zstd zram (run from the repo root)
+sudo install -m 644 system/etc/auto-cpufreq.conf /etc/auto-cpufreq.conf
+sudo install -m 644 system/etc/zram-generator.conf /etc/systemd/zram-generator.conf
+
+# Charge limit 50/80: on Dell, auto-cpufreq's thresholds do nothing; set BIOS Custom mode instead
+echo Custom | sudo tee /sys/class/firmware-attributes/dell-wmi-sysman/attributes/PrimaryBattChargeCfg/current_value
 
 # Install auto-cpufreq as a systemd daemon (this is what makes the conf take effect)
 sudo auto-cpufreq --install
@@ -230,8 +233,10 @@ sudo visudo -cf /etc/sudoers.d/auto-cpufreq-force
 ```bash
 systemctl is-active auto-cpufreq powertop thermald   # all active
 systemctl is-enabled tlp                              # masked
-cat /sys/class/power_supply/BAT0/charge_control_end_threshold   # 80
+cat /sys/class/power_supply/BAT0/charge_types                   # [Custom]
 ```
+
+Slow apps, a stuck 400 MHz CPU, a wrong charging icon or heat: see [docs/laptop-performance.md](docs/laptop-performance.md).
 
 **Keybinds** (sway):
 - `Super+Shift+P` — cycle power profile (performance / powersave / auto)

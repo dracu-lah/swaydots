@@ -2,3 +2,7 @@
 README.md
 og-image.png
 setup.sh
+^/system
+^/docs
+^/AGENTS\.md
+^/CLAUDE\.md
