@@ -14,7 +14,6 @@
 ### Variables
 ### ==============================================================================
 
-# Logo key. Use Mod1 for Alt.
 set $mod Mod4
 
 # Direction keys (vim style)
@@ -25,333 +24,267 @@ set $right l
 
 # Applications
 set $term alacritty
-set $browser flatpak run app.zen_browser.zen
+set $browser ~/.local/opt/zen/zen
 set $file-manager nemo
 set $menu wofi --show drun
 
-# Visuals
-set $lock_bg  ~/wallpapers/wallpaper.jpg
-set $screen_bg ~/wallpapers/wallpaper.jpg
+# Paths
+set $scripts ~/.config/sway/scripts
+set $wallpaper ~/wallpapers/wallpaper.jpg
+set $lock swaylock -f -i $wallpaper
 
-# Include system-wide variables
 include /etc/sway/config-vars.d/*
 
 
 ### ==============================================================================
-### Output Configuration
+### Outputs
 ### ==============================================================================
 
-# External monitor (left)
-output HDMI-A-1 resolution 1920x1080@60hz position 0,0 
-# output DP-1   position 0,0  scale 1.4
+# External monitor (left of the laptop)
+# output HDMI-A-1 resolution 1920x1080@60hz position 0,0
+# output DP-1 position 0,0 scale 1.4
 
-# Built-in monitor (right of external)
 output eDP-1 resolution 1920x1080@60hz position 1920,0
+output * bg $wallpaper fill
 
-# Wallpaper
-output * bg $screen_bg fill
-
-# Laptop Lid Behavior
-# Hibernate on lid close.
-bindswitch --locked --reload lid:on exec ~/.config/sway/scripts/lid.sh
+# Lid closed: hibernate. Lid open: make sure the panel is on.
+bindswitch --locked --reload lid:on exec systemctl hibernate
 bindswitch --locked --reload lid:off output eDP-1 enable
 
 
 ### ==============================================================================
-### Input Configuration
+### Input
 ### ==============================================================================
 
-# Touchpad settings
 input type:touchpad {
     dwt enabled
     tap enabled
     natural_scroll enabled
     middle_emulation enabled
-    # accel_profile flat
-    # pointer_accel 0.4
 }
 
-# Keyboard settings
-input type:keyboard {
-    repeat_rate 50
-}
-
-# Touchscreen settings
-input type:touch {
-    events disabled
-}
+input type:keyboard repeat_rate 50
+input type:touch events disabled
 
 
 ### ==============================================================================
-### General Appearance
+### Appearance
 ### ==============================================================================
 
 font pango:JetBrainsMono Nerd Font 9
-
-# Drag floating windows by holding down $mod and left mouse button.
-# Resize them with right mouse button + $mod.
+default_border pixel 1
+hide_edge_borders smart
+popup_during_fullscreen smart
 floating_modifier $mod normal
 
-# Borders and Gaps
-default_border pixel 1
-gaps inner 0
-gaps outer 0
-smart_gaps on
-hide_edge_borders smart
-
-# Popups and Dialogs
-popup_during_fullscreen smart
-
-# Colors                 border  bg      text    indicator child_border
+# Colors                 border  bg      text    indicator
 client.focused           #ffffff #ffffff #000000 #fc2d2d
 client.unfocused         #000000 #000000 #ffffff
 client.focused_inactive  #000000 #000000 #ffffff
 
 
 ### ==============================================================================
-### Idle and Lock Configuration
+### Idle and lock
 ### ==============================================================================
 
-# Lock screen manually
-bindsym Alt+l exec 'swaylock -i $lock_bg'
+# Battery: screen off at 2 min, suspend at 3 min.
+# AC:      screen off at 10 min, suspend at 30 min.
+# idle.sh skips the battery steps when plugged in, so nothing polls the charger.
+exec swayidle -w \
+    timeout 120  '$scripts/idle.sh bat screen-off' resume 'swaymsg "output * power on"' \
+    timeout 180  '$scripts/idle.sh bat suspend' \
+    timeout 600  '$scripts/idle.sh any screen-off' resume 'swaymsg "output * power on"' \
+    timeout 1800 '$scripts/idle.sh any suspend' \
+    before-sleep '$lock' \
+    lock '$lock'
 
-# Idle management — battery-aware (aggressive on bat, relaxed on AC).
-# AC:  10m dpms-off, 30m suspend.  Battery: 2m dpms-off, 3m suspend.
-exec ~/.config/sway/scripts/swayidle-watch.sh
+# Never idle while a window is fullscreen (videos, presentations)
+for_window [all] inhibit_idle fullscreen
+
+bindsym Alt+l exec loginctl lock-session
+
+
+### ==============================================================================
+### Key bindings
+### ==============================================================================
+
+## Applications
+bindsym $mod+Return exec $term
+bindsym $mod+i exec $browser
+bindsym $mod+e exec $file-manager
+bindsym $mod+d exec $menu
+bindsym Alt+c exec wl-color-picker clipboard
+
+## Screenshots, clipboard, recording
+bindsym Print exec $scripts/screenshot -f
+bindsym Shift+Print exec $scripts/screenshot -s
+bindsym $mod+Shift+v exec $scripts/clipboard.sh
+bindsym $mod+Shift+r exec $scripts/record.sh
+
+## Audio (wpctl follows the default sink: speakers, jack, USB, Bluetooth)
+bindsym --locked XF86AudioRaiseVolume exec $scripts/osd.sh volume up
+bindsym --locked XF86AudioLowerVolume exec $scripts/osd.sh volume down
+bindsym --locked XF86AudioMute exec $scripts/osd.sh volume mute
+bindsym --locked XF86AudioMicMute exec $scripts/osd.sh mic
+bindsym --locked XF86AudioPlay exec playerctl play-pause
+bindsym --locked XF86AudioNext exec playerctl next
+bindsym --locked XF86AudioPrev exec playerctl previous
+
+## Brightness
+bindsym --locked XF86MonBrightnessUp exec $scripts/osd.sh brightness up
+bindsym --locked XF86MonBrightnessDown exec $scripts/osd.sh brightness down
+
+## Power
+bindsym $mod+Shift+p exec $scripts/power-profile.sh
+bindsym $mod+Shift+b exec ~/.config/waybar/scripts/battery-info.sh
+bindsym $mod+x exec waylogout \
+    --hide-cancel \
+    --screenshots \
+    --effect-greyscale \
+    --effect-scale=0.5 \
+    --effect-vignette=0.3:0.7 \
+    --font="JetBrainsMono Nerd Font" \
+    --fa-font="JetBrainsMono Nerd Font" \
+    --label-font-size=16 \
+    --symbol-font-size=50 \
+    --indicator-radius=70 \
+    --indicator-thickness=4 \
+    --indicator-separation=60 \
+    --ring-color=4a4a4aff \
+    --inside-color=1a1a1ad9 \
+    --text-color=eaeaeaff \
+    --line-color=00000000 \
+    --ring-selection-color=ff5555ff \
+    --inside-selection-color=2a1414e6 \
+    --text-selection-color=ffffffff \
+    --line-selection-color=00000000 \
+    --poweroff-symbol="󰐥" \
+    --poweroff-label="power off" \
+    --poweroff-command="poweroff" \
+    --reboot-symbol="󰜉" \
+    --reboot-label="reboot" \
+    --reboot-command="reboot" \
+    --logout-symbol="󰍃" \
+    --logout-label="logout" \
+    --logout-command="swaymsg exit" \
+    --selection-label
+
+## Sway
+bindsym $mod+c kill
+bindsym $mod+Shift+c reload
+bindsym $mod+Shift+e exec swaymsg exit
+
+## Focus and move (vim keys and arrows)
+bindsym $mod+$left focus left
+bindsym $mod+$down focus down
+bindsym $mod+$up focus up
+bindsym $mod+$right focus right
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Up focus up
+bindsym $mod+Right focus right
+
+bindsym $mod+Shift+$left move left
+bindsym $mod+Shift+$down move down
+bindsym $mod+Shift+$up move up
+bindsym $mod+Shift+$right move right
+bindsym $mod+Shift+Left move left
+bindsym $mod+Shift+Down move down
+bindsym $mod+Shift+Up move up
+bindsym $mod+Shift+Right move right
+
+## Workspaces
+workspace_auto_back_and_forth yes
+
+bindsym $mod+1 workspace number 1
+bindsym $mod+2 workspace number 2
+bindsym $mod+3 workspace number 3
+bindsym $mod+4 workspace number 4
+bindsym $mod+5 workspace number 5
+bindsym $mod+6 workspace number 6
+bindsym $mod+7 workspace number 7
+bindsym $mod+8 workspace number 8
+bindsym $mod+9 workspace number 9
+bindsym $mod+0 workspace number 10
+
+bindsym $mod+Shift+1 move container to workspace number 1
+bindsym $mod+Shift+2 move container to workspace number 2
+bindsym $mod+Shift+3 move container to workspace number 3
+bindsym $mod+Shift+4 move container to workspace number 4
+bindsym $mod+Shift+5 move container to workspace number 5
+bindsym $mod+Shift+6 move container to workspace number 6
+bindsym $mod+Shift+7 move container to workspace number 7
+bindsym $mod+Shift+8 move container to workspace number 8
+bindsym $mod+Shift+9 move container to workspace number 9
+bindsym $mod+Shift+0 move container to workspace number 10
+
+## Layout
+bindsym $mod+b splith
+bindsym $mod+v splitv
+bindsym $mod+s layout stacking
+bindsym $mod+w layout tabbed
+bindsym $mod+t layout toggle split
+bindsym $mod+f fullscreen
+bindsym $mod+space floating toggle
+bindsym $mod+Shift+space focus mode_toggle
+bindsym $mod+a focus parent
+
+## Scratchpad
+bindsym $mod+Shift+minus move scratchpad
+bindsym $mod+minus scratchpad show
+
+## Resize
+mode "resize" {
+    bindsym $left resize shrink width 10px
+    bindsym $down resize grow height 10px
+    bindsym $up resize shrink height 10px
+    bindsym $right resize grow width 10px
+    bindsym Left resize shrink width 10px
+    bindsym Down resize grow height 10px
+    bindsym Up resize shrink height 10px
+    bindsym Right resize grow width 10px
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
+bindsym $mod+r mode "resize"
 
 
 ### ==============================================================================
-### Key Bindings
+### Window rules
 ### ==============================================================================
 
-## --- Applications --- ##
-    bindsym $mod+Return exec $term
-    bindsym $mod+i exec $browser
-    bindsym $mod+e exec $file-manager
-    bindsym $mod+d exec $menu
-    bindsym Alt+c exec wl-color-picker clipboard
-
-## --- System & Hardware --- ##
-    # Screenshots
-    bindsym Print exec ~/.config/sway/scripts/screenshot -f
-    bindsym Shift+Print exec ~/.config/sway/scripts/screenshot -s
-
-    # Clipboard & Recording
-    bindsym $mod+Shift+v exec /home/dracu/.config/sway/scripts/clipboard.sh
-    bindsym $mod+Shift+r exec /home/dracu/.config/sway/scripts/record.sh
-
-    # Volume / mute (wpctl follows the active default sink — works for built-in,
-    # 3.5mm jack, USB DAC, and Bluetooth headphones automatically).
-    bindsym XF86AudioRaiseVolume exec wpctl set-volume -l 1.5 @DEFAULT_AUDIO_SINK@ 5%+ && \
-        notify-send -h string:x-canonical-private-synchronous:volume Volume \
-            -h int:value:$(wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{print int($2*100)}')
-    bindsym XF86AudioLowerVolume exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%- && \
-        notify-send -h string:x-canonical-private-synchronous:volume Volume \
-            -h int:value:$(wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{print int($2*100)}')
-    bindsym XF86AudioMute exec wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle && \
-        notify-send -h string:x-canonical-private-synchronous:volume Volume \
-            "$(wpctl get-volume @DEFAULT_AUDIO_SINK@ | grep -q MUTED && echo Muted || echo Unmuted)"
-
-    # Mic mute
-    bindsym XF86AudioMicMute exec wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle && \
-        notify-send -h string:x-canonical-private-synchronous:mic Microphone \
-            "$(wpctl get-volume @DEFAULT_AUDIO_SOURCE@ | grep -q MUTED && echo Muted || echo Unmuted)"
-
-    # Media playback (Spotify, Firefox, mpv, etc.)
-    bindsym XF86AudioPlay exec playerctl play-pause
-    bindsym XF86AudioNext exec playerctl next
-    bindsym XF86AudioPrev exec playerctl previous
-
-    # Brightness Control
-    bindsym XF86MonBrightnessUp exec brightnessctl s +5% && \
-        notify-send Brightness -h int:value:$(brightnessctl | awk '/Current/ {print $4}' | tr -d '()')
-
-    bindsym XF86MonBrightnessDown exec brightnessctl s 5%- && \
-        notify-send Brightness -h int:value:$(brightnessctl | awk '/Current/ {print $4}' | tr -d '()')
-
-    # Power profile cycle: powersave -> performance -> auto
-    bindsym $mod+Shift+p exec ~/.config/sway/scripts/power-profile.sh
-
-    # Battery health popup (also fires on click of waybar battery)
-    bindsym $mod+Shift+b exec ~/.config/waybar/scripts/battery-info.sh
-
-## --- Power Menu --- ##
-    bindsym $mod+x exec waylogout \
-        --hide-cancel \
-        --screenshots \
-        --effect-greyscale \
-        --effect-scale=0.5 \
-        --effect-vignette=0.3:0.7 \
-        --font="JetBrainsMono Nerd Font" \
-        --fa-font="JetBrainsMono Nerd Font" \
-        --label-font-size=16 \
-        --symbol-font-size=50 \
-        --indicator-radius=70 \
-        --indicator-thickness=4 \
-        --indicator-separation=60 \
-        --ring-color=4a4a4aff \
-        --inside-color=1a1a1ad9 \
-        --text-color=eaeaeaff \
-        --line-color=00000000 \
-        --ring-selection-color=ff5555ff \
-        --inside-selection-color=2a1414e6 \
-        --text-selection-color=ffffffff \
-        --line-selection-color=00000000 \
-        --poweroff-symbol="󰐥" \
-        --poweroff-label="power off" \
-        --poweroff-command="poweroff" \
-        --reboot-symbol="󰜉" \
-        --reboot-label="reboot" \
-        --reboot-command="reboot" \
-        --logout-symbol="󰍃" \
-        --logout-label="logout" \
-        --logout-command="swaymsg exit" \
-        --selection-label
-
-## --- Sway Management --- ##
-    bindsym $mod+c kill
-    bindsym $mod+Shift+c reload
-    bindsym $mod+Shift+e exec 'swaymsg exit'
-
-## --- Navigation --- ##
-    # Workspace Back-and-Forth
-    workspace_auto_back_and_forth yes
-
-    # Focus (vim style)
-    bindsym $mod+$left focus left
-    bindsym $mod+$down focus down
-    bindsym $mod+$up focus up
-    bindsym $mod+$right focus right
-    
-    # Focus (arrow keys)
-    bindsym $mod+Left focus left
-    bindsym $mod+Down focus down
-    bindsym $mod+Up focus up
-    bindsym $mod+Right focus right
-
-    # Move window (vim style)
-    bindsym $mod+Shift+$left move left
-    bindsym $mod+Shift+$down move down
-    bindsym $mod+Shift+$up move up
-    bindsym $mod+Shift+$right move right
-    
-    # Move window (arrow keys)
-    bindsym $mod+Shift+Left move left
-    bindsym $mod+Shift+Down move down
-    bindsym $mod+Shift+Up move up
-    bindsym $mod+Shift+Right move right
-
-    # Workspaces: Switch
-    bindsym $mod+1 workspace number 1
-    bindsym $mod+2 workspace number 2
-    bindsym $mod+3 workspace number 3
-    bindsym $mod+4 workspace number 4
-    bindsym $mod+5 workspace number 5
-    bindsym $mod+6 workspace number 6
-    bindsym $mod+7 workspace number 7
-    bindsym $mod+8 workspace number 8
-    bindsym $mod+9 workspace number 9
-    bindsym $mod+0 workspace number 10
-
-    # Workspaces: Move Container
-    bindsym $mod+Shift+1 move container to workspace number 1
-    bindsym $mod+Shift+2 move container to workspace number 2
-    bindsym $mod+Shift+3 move container to workspace number 3
-    bindsym $mod+Shift+4 move container to workspace number 4
-    bindsym $mod+Shift+5 move container to workspace number 5
-    bindsym $mod+Shift+6 move container to workspace number 6
-    bindsym $mod+Shift+7 move container to workspace number 7
-    bindsym $mod+Shift+8 move container to workspace number 8
-    bindsym $mod+Shift+9 move container to workspace number 9
-    bindsym $mod+Shift+0 move container to workspace number 10
-
-## --- Layout & Window Management --- ##
-    # Splits
-    bindsym $mod+b splith
-    bindsym $mod+v splitv
-
-    # Layout Styles
-    bindsym $mod+s layout stacking
-    bindsym $mod+w layout tabbed
-    bindsym $mod+t layout toggle split
-
-    # Fullscreen & Floating
-    bindsym $mod+f fullscreen
-    bindsym $mod+space floating toggle
-    bindsym $mod+Shift+space focus mode_toggle
-
-    # Focus Parent
-    bindsym $mod+a focus parent
-
-    # Scratchpad
-    bindsym $mod+Shift+minus move scratchpad
-    bindsym $mod+minus scratchpad show
-
-    # Resizing Mode
-    mode "resize" {
-        bindsym $left resize shrink width 10px
-        bindsym $down resize grow height 10px
-        bindsym $up resize shrink height 10px
-        bindsym $right resize grow width 10px
-
-        bindsym Left resize shrink width 10px
-        bindsym Down resize grow height 10px
-        bindsym Up resize shrink height 10px
-        bindsym Right resize grow width 10px
-
-        bindsym Return mode "default"
-        bindsym Escape mode "default"
-    }
-    bindsym $mod+r mode "resize"
-
-### ==============================================================================
-### Window Rules
-### ==============================================================================
-
-for_window [app_id="float"] floating enable;
-for_window [app_id="org.kde.kdeconnect.daemon"] floating enable;
-for_window [title="File Operation Progress"] floating enable;
-for_window [title="zbar barcode reader"] floating enable; # wifi-qr
-for_window [app_id="zenity"] floating enable;
-for_window [app_id="imv"] floating enable;
-for_window [app_id="blueman-manager"] floating enable;
+for_window [app_id="float"] floating enable
+for_window [app_id="org.kde.kdeconnect.daemon"] floating enable
+for_window [app_id="zenity"] floating enable
+for_window [app_id="imv"] floating enable
+for_window [app_id="blueman-manager"] floating enable
 for_window [app_id="pavucontrol"] floating enable
-for_window [app_id="wl-color-picker"] floating enable;
-for_window [shell=".*"] title_format "%title - %shell"
-for_window [shell="xwayland"] title_format "%title [xwayland]"
-for_window [class="scrcpy"] floating enable, sticky enable, resize set 400 800
+for_window [app_id="wl-color-picker"] floating enable
 for_window [app_id="org.remmina.Remmina"] floating enable
+for_window [title="File Operation Progress"] floating enable
+for_window [title="zbar barcode reader"] floating enable
+for_window [class="scrcpy"] floating enable, sticky enable, resize set 400 800
 
-xwayland enable
+# Mark X11 apps in tab and stack titles
+for_window [shell="xwayland"] title_format "%title [xwayland]"
+
+# Android emulators open on workspace 10, out of the way
+for_window [class="Emulator"] move container to workspace number 10
+no_focus [class="Emulator"]
+
 
 ### ==============================================================================
-### Status Bar
+### Bar and autostart
 ### ==============================================================================
 
-bar {
-    swaybar_command waybar
-}
+bar swaybar_command waybar
 
+# The environment import and sway-session.target come from
+# /etc/sway/config.d/10-systemd-session.conf; the keyring starts at login (PAM).
+exec /usr/libexec/lxqt-policykit-agent
+exec nm-applet --indicator
+exec blueman-applet
+exec wl-paste --type text --watch cliphist store
+exec wl-paste --type image --watch cliphist store
 
-### ==============================================================================
-### Autostart
-### ==============================================================================
-
-exec {
-  # DBus & Systemd Environment Update
-  dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
-
-  # Polkit Authentication Agent (lxqt-policykit on Fedora)
-  /usr/libexec/lxqt-policykit-agent
-
-  # Network Manager Applet
-  nm-applet --indicator
-
-  blueman-applet
-  wl-paste --type text --watch cliphist store
-  wl-paste --type image --watch cliphist store
-  eval $(gnome-keyring-daemon --start)
-}
-
-# Final system includes
 include /etc/sway/config.d/*
