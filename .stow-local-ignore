@@ -6,3 +6,6 @@ setup.sh
 ^/docs
 ^/AGENTS\.md
 ^/CLAUDE\.md
+^/GEMINI\.md
+^/\.github
+^/\.aider\.conf\.yml

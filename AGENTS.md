@@ -19,3 +19,13 @@ laptop currently runs Fedora 43. Use `dnf` equivalents there.
 - Waybar's battery module only mirrors `/sys/class/power_supply`. A wrong charging icon is a
   firmware/charger issue, not a waybar bug.
 - `Super+Shift+P` (`power-profile.sh`) cycles the auto-cpufreq override through a NOPASSWD sudoers rule for `/usr/local/bin/auto-cpufreq`.
+
+## Agent files
+
+`AGENTS.md` is the single source; edit only this file.
+
+- Read it directly: Codex, Cursor, Zed, OpenCode, Amp, Jules.
+- Claude Code: `CLAUDE.md` imports it with `@AGENTS.md`.
+- Gemini CLI: `GEMINI.md` imports it with `@AGENTS.md`.
+- GitHub Copilot: `.github/copilot-instructions.md` is a symlink to it.
+- Aider: `.aider.conf.yml` loads it with `read:`.
