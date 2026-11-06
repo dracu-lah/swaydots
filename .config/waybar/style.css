@@ -47,6 +47,7 @@ window#waybar {
 #network,
 #cpu,
 #memory,
+#disk,
 #temperature,
 #battery,
 #clock,
@@ -86,3 +87,6 @@ window#waybar {
     opacity: 1;
   }
 }
+
+#disk.warning { color: #e5c07b; }
+#disk.critical { color: #ff5555; }

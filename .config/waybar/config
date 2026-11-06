@@ -18,6 +18,7 @@
     "network",
     "cpu",
     "memory",
+    "disk",
     "temperature",
 
     "clock",
@@ -29,7 +30,8 @@
       "format": "{}",
       "exec": "~/.config/waybar/scripts/toggle_night_light.sh status",
       "on-click": "~/.config/waybar/scripts/toggle_night_light.sh toggle",
-      "interval": 5,
+      "interval": 60,
+      "signal": 9,
       "tooltip-format": "Night Light: {alt}",
       "class": "night-light"
   },
@@ -80,6 +82,16 @@
     "tooltip-format": "{used:0.1f}GB / {total:0.1f}GB"
   },
 
+  "disk": {
+    "path": "/",
+    "interval": 60,
+    "unit": "GiB",
+    "format": "\uf0a0 {specific_used:0.0f}GB",
+    "tooltip-format": "{specific_used:0.0f}GB / {specific_total:0.0f}GB used ({percentage_used}%), {specific_free:0.0f}GB free",
+    "states": { "warning": 85, "critical": 95 },
+    "on-click": "alacritty -e sh -c 'command -v ncdu >/dev/null && ncdu ~ || { du -xsh ~/* ~/.[!.]* 2>/dev/null | sort -rh | head -25; read x; }'"
+  },
+
   "temperature": {
     "hwmon-path-abs": "/sys/devices/platform/coretemp.0/hwmon",
     "input-filename": "temp1_input",
@@ -118,7 +130,8 @@
   "custom/wf-recorder-status": {
     "exec": "~/.config/waybar/scripts/wf-recorder-status.sh",
     "return-type": "json",
-    "interval": 3,
-    "on-click": "exec ~/.config/waybar/scripts/record.sh"
+    "interval": 30,
+    "signal": 8,
+    "on-click": "~/.config/sway/scripts/record.sh"
   }
 }
