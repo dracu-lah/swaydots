@@ -102,7 +102,7 @@
   },
 
   "custom/clock": {
-    "exec": "~/.config/waybar/scripts/clock.sh",
+    "exec": "~/.config/waybar/scripts/kcal/clock.sh",
     "return-type": "json",
     "interval": 30,
     "on-click": "~/.config/waybar/scripts/kcal/kcal.py --toggle"

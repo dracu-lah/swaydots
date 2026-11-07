@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# custom/clock: {text, tooltip}. Holidays come from the kcal cache (snapshot as fallback).
-dir="$(dirname "$(readlink -f "$0")")/kcal"
-store="$HOME/.cache/kcal/holidays.json"
+# Waybar custom/clock (or any bar that takes {text, tooltip} JSON): {text, tooltip}. Holidays come from the kcal cache (snapshot as fallback).
+dir="$(dirname "$(readlink -f "$0")")"
+store="${XDG_CACHE_HOME:-$HOME/.cache}/kcal/holidays.json"
 [ -r "$store" ] || store="$dir/snapshot.json"
 today=$(date +%F)
 text=$(date '+%H:%M %d/%m/%Y')

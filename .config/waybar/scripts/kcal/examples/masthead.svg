@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="200" viewBox="0 0 900 200">
+  <!-- Example image masthead for kcal: replace with your own (PNG, SVG or JPEG). -->
+  <rect x="20" y="30" width="140" height="140" rx="18" fill="#b3181e"/>
+  <text x="90" y="128" font-family="serif" font-size="96" font-weight="bold" fill="#f6f3ec" text-anchor="middle">ക</text>
+  <text x="190" y="118" font-family="serif" font-size="92" font-weight="bold" fill="#141414">Team Calendar</text>
+  <rect x="190" y="140" width="680" height="6" fill="#141414"/>
+</svg>

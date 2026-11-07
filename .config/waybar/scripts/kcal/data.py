@@ -7,7 +7,7 @@ import threading
 import urllib.request
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-CACHE_DIR = os.path.expanduser("~/.cache/kcal")
+CACHE_DIR = os.path.join(os.environ.get("XDG_CACHE_HOME") or os.path.expanduser("~/.cache"), "kcal")
 CACHE = os.path.join(CACHE_DIR, "holidays.json")
 UNMATCHED = os.path.join(CACHE_DIR, "unmatched.log")
 MAX_AGE = 7 * 86400

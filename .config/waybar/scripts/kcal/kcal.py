@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
-"""Kerala calendar popup for waybar. GTK3 + gtk-layer-shell.
+"""Kerala calendar popup. GTK3; a layer-shell overlay on Wayland compositors that have it
+(Sway, Hyprland, river, niri, KDE), a plain undecorated window everywhere else (X11, GNOME).
 
   kcal.py --toggle                         open, or close if already open (pid file)
+  kcal.py --toggle --masthead "Title"      typed title instead of the configured masthead
+  kcal.py --toggle --masthead-image f.png  image masthead (PNG, SVG, JPEG)
   kcal.py --screenshot out.png --month 2026-08 [--today 2026-11-07]   offscreen render for tests
 """
 import argparse
@@ -12,6 +15,7 @@ import signal
 import subprocess
 import sys
 import urllib.parse
+import webbrowser
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -20,20 +24,22 @@ import gi  # noqa: E402
 
 gi.require_version("Gtk", "3.0")
 gi.require_version("Gdk", "3.0")
-from gi.repository import GLib, Gdk, Gtk, Pango  # noqa: E402
+from gi.repository import GLib  # noqa: E402
+
+GLib.set_prgname("kcal")  # before Gtk starts: WM_CLASS / app_id "kcal", for window rules
+from gi.repository import Gdk, Gtk, Pango  # noqa: E402
 
 import data  # noqa: E402
 import malayalam as ml  # noqa: E402
+import settings  # noqa: E402
 
-ZEN = os.path.expanduser("~/.local/opt/zen/zen")
 PID = os.path.join(os.environ.get("XDG_RUNTIME_DIR") or data.CACHE_DIR, "kcal.pid")
 MONTHS = list(calendar.month_name)[1:]
 WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 CELL_W, CELL_H = 66, 62
 SIDE_W = 124
-LOGO = os.path.join(HERE, "assets", "mathrubhumi.png")
-LOGO_H = 88  # px; matches the ~87px mini month boxes beside it (ink is ~90% of the image height)
-MASTHEAD = None  # --masthead: a typed title instead of the logo (screenshots to share, no trademark)
+MAST_W = 460  # px; widest masthead that fits between the two mini months
+CFG = dict(settings.DEFAULTS)  # replaced in main() by the user config plus command-line overrides
 
 
 def label(text, *classes, xalign=None):
@@ -47,13 +53,15 @@ def label(text, *classes, xalign=None):
 
 def open_search(h, year):
     query = f"{h['name']} {year} Kerala"
-    try:
-        subprocess.Popen([ZEN, "--search", query], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                         start_new_session=True)
-    except OSError:
-        url = "https://www.google.com/search?q=" + urllib.parse.quote_plus(query)
-        subprocess.Popen(["xdg-open", url], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                         start_new_session=True)
+    cmd = CFG["search_command"]
+    if cmd:
+        argv = [os.path.expanduser(cmd[0])] + [c.replace("{query}", query) for c in cmd[1:]]
+        try:
+            subprocess.Popen(argv, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+            return
+        except OSError as e:
+            print(f"kcal: search_command {argv[0]}: {e}", file=sys.stderr)
+    webbrowser.open(CFG["search_url"].replace("{query}", urllib.parse.quote_plus(query)))
 
 
 def set_pointer(w, on):
@@ -72,11 +80,12 @@ class Popup(Gtk.Window):
         self.sel = None
         self.layer = layer
         self.msg_id = 0
+        self.menus = []
         self.get_style_context().add_class("kcal")
         self.set_default_size(560, -1)
         self.set_resizable(False)
-        if layer:
-            self.setup_layer()
+        if layer and not self.setup_layer():
+            self.setup_floating()
         self.add_events(Gdk.EventMask.SCROLL_MASK | Gdk.EventMask.KEY_PRESS_MASK)
         self.connect("key-press-event", self.on_key)
         self.connect("scroll-event", self.on_scroll)
@@ -85,8 +94,20 @@ class Popup(Gtk.Window):
         self.render()
 
     def setup_layer(self):
-        gi.require_version("GtkLayerShell", "0.1")
-        from gi.repository import GtkLayerShell as L
+        """Top-right overlay through gtk-layer-shell. False when the session has none (X11, GNOME,
+        other OSes), the typelib is missing, or KCAL_NO_LAYER is set."""
+        if os.environ.get("KCAL_NO_LAYER"):
+            return False
+        try:
+            gi.require_version("GtkLayerShell", "0.1")
+            from gi.repository import GtkLayerShell as L
+        except (ValueError, ImportError):
+            return False
+        if hasattr(L, "is_supported"):
+            if not L.is_supported():
+                return False
+        elif "Wayland" not in type(Gdk.Display.get_default()).__name__:
+            return False
         L.init_for_window(self)
         L.set_namespace(self, "kcal")
         L.set_layer(self, L.Layer.OVERLAY)
@@ -96,6 +117,25 @@ class Popup(Gtk.Window):
         L.set_margin(self, L.Edge.RIGHT, 6)
         L.set_keyboard_mode(self, L.KeyboardMode.ON_DEMAND)
         self.make_backdrop(L)
+        return True
+
+    def setup_floating(self):
+        """No layer-shell: an undecorated, always-on-top window by the pointer (X11; Wayland
+        compositors place it themselves) that closes when it loses focus."""
+        self.set_title("Kerala calendar")
+        self.set_decorated(False)
+        self.set_skip_taskbar_hint(True)
+        self.set_skip_pager_hint(True)
+        self.set_keep_above(True)
+        self.set_type_hint(Gdk.WindowTypeHint.DIALOG)
+        self.set_position(Gtk.WindowPosition.MOUSE)
+        self.connect("focus-out-event", lambda *_: GLib.timeout_add(200, self.close_if_unfocused) and False)
+
+    def close_if_unfocused(self):
+        # The month and year menus take focus while open, so only close when none is showing.
+        if not self.is_active() and not any(m.get_visible() for m in self.menus):
+            self.close_popup()
+        return False
 
     def make_backdrop(self, L):
         # Invisible full-screen surface under the popup: a click on it closes the popup.
@@ -221,6 +261,7 @@ class Popup(Gtk.Window):
             menu.attach(it, i % cols, i % cols + 1, i // cols, i // cols + 1)
         menu.show_all()
         menu.attach_to_widget(lb, None)
+        self.menus.append(menu)
 
         def pop(w, _uri):
             menu.popup_at_widget(w, Gdk.Gravity.SOUTH_WEST, Gdk.Gravity.NORTH_WEST, Gtk.get_current_event())
@@ -234,27 +275,30 @@ class Popup(Gtk.Window):
         return lb
 
     def logo(self):
-        """Masthead logo from assets/, drawn from a 2x surface so it stays sharp on HiDPI.
-        Falls back to the typed wordmark when the file is missing."""
-        if MASTHEAD:
-            return label(MASTHEAD, "mast", xalign=0.5)
-        try:
-            from gi.repository import GdkPixbuf
-            pb = GdkPixbuf.Pixbuf.new_from_file_at_scale(LOGO, -1, LOGO_H * 2, True)
-            if pb.get_has_alpha() and pb.get_n_channels() == 4:
-                # The source has faint alpha haze (1..15) over its background: clear it at load time
-                # (the file stays untouched) so no pale box shows on the paper colour.
-                px = bytearray(pb.get_pixels())
-                px[3::4] = bytes(px[3::4]).translate(bytes(0 if i < 16 else i for i in range(256)))
-                pb = GdkPixbuf.Pixbuf.new_from_bytes(GLib.Bytes.new(bytes(px)), pb.get_colorspace(), True, 8,
-                                                     pb.get_width(), pb.get_height(), pb.get_rowstride())
-            surf = Gdk.cairo_surface_create_from_pixbuf(pb, 2, None)
-            img = Gtk.Image.new_from_surface(surf)
-            img.get_style_context().add_class("logo")
-            img.set_tooltip_text(None)
-            return img
-        except GLib.Error:
-            return label("കേരള കലണ്ടർ", "mast", xalign=0.5)
+        """Masthead from the config: the image if one is set and loads (drawn from a 2x surface so it
+        stays sharp on HiDPI, capped at MAST_W wide), else the text."""
+        path, h = CFG["masthead_image"], CFG["masthead_height"]
+        if path:
+            try:
+                from gi.repository import GdkPixbuf
+                pb = GdkPixbuf.Pixbuf.new_from_file_at_scale(path, MAST_W * 2, h * 2, True)
+                if pb.get_has_alpha() and pb.get_n_channels() == 4:
+                    # Scans and exports often carry faint alpha haze (1..15) over the background: clear
+                    # it at load time (the file stays untouched) so no pale box shows on the paper.
+                    px = bytearray(pb.get_pixels())
+                    px[3::4] = bytes(px[3::4]).translate(bytes(0 if i < 16 else i for i in range(256)))
+                    pb = GdkPixbuf.Pixbuf.new_from_bytes(GLib.Bytes.new(bytes(px)), pb.get_colorspace(), True, 8,
+                                                         pb.get_width(), pb.get_height(), pb.get_rowstride())
+                surf = Gdk.cairo_surface_create_from_pixbuf(pb, 2, None)
+                img = Gtk.Image.new_from_surface(surf)
+                img.get_style_context().add_class("logo")
+                return img
+            except GLib.Error as e:
+                print(f"kcal: masthead image {path}: {e.message}", file=sys.stderr)
+        w = label(CFG["masthead_text"], "mast", xalign=0.5)
+        w.set_ellipsize(Pango.EllipsizeMode.END)
+        w.set_max_width_chars(16)
+        return w
 
     def nav_btn(self, txt, tip, step):
         b = Gtk.Button(label=txt)
@@ -381,12 +425,20 @@ class Popup(Gtk.Window):
 
     def copy_day(self, d):
         txt = f"{d.strftime('%A, %d %B %Y')} ({ml.long_date(d)}, ME)"
-        try:
-            subprocess.Popen(["wl-copy", txt], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                             start_new_session=True)
-            self.flash(f"Copied: {txt}")
-        except OSError:
-            self.flash("wl-copy not found")
+        # wl-copy keeps the text after the popup closes on Wayland; GTK's own clipboard is the
+        # fallback (X11 clipboard managers keep it through store()).
+        if os.environ.get("WAYLAND_DISPLAY"):
+            try:
+                subprocess.Popen(["wl-copy", txt], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                                 start_new_session=True)
+                self.flash(f"Copied: {txt}")
+                return
+            except OSError:
+                pass
+        cb = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+        cb.set_text(txt, -1)
+        cb.store()
+        self.flash(f"Copied: {txt}")
 
     def shift(self, n):
         i = self.year * 12 + self.month - 1 + n
@@ -630,7 +682,16 @@ class Popup(Gtk.Window):
 def css():
     p = Gtk.CssProvider()
     p.load_from_path(os.path.join(HERE, "style.css"))
-    Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), p, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+    scr = Gdk.Screen.get_default()
+    Gtk.StyleContext.add_provider_for_screen(scr, p, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+    extra = settings.user_css()
+    if extra:
+        u = Gtk.CssProvider()
+        try:
+            u.load_from_path(extra)
+            Gtk.StyleContext.add_provider_for_screen(scr, u, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION + 1)
+        except GLib.Error as e:
+            print(f"kcal: ignoring {extra}: {e.message}", file=sys.stderr)
 
 
 def month_arg(s, today):
@@ -644,6 +705,12 @@ def alive(pid):
     try:
         with open(f"/proc/{pid}/cmdline", "rb") as f:
             return b"kcal.py" in f.read()
+    except OSError:
+        if os.path.isdir("/proc/self"):
+            return False
+    try:  # no /proc (macOS, BSD): the pid exists, trust the pid file
+        os.kill(pid, 0)
+        return True
     except OSError:
         return False
 
@@ -683,11 +750,17 @@ def main():
     ap.add_argument("--month")
     ap.add_argument("--today")
     ap.add_argument("--hover", help="YYYY-MM-DD: also render that day's tooltip card (screenshot only)")
-    ap.add_argument("--masthead", help="typed title instead of the logo")
+    ap.add_argument("--masthead", help="typed title, overrides the config (and its image)")
+    ap.add_argument("--masthead-image", help="image file for the masthead, overrides the config")
+    ap.add_argument("--config", help="config file (default $XDG_CONFIG_HOME/kcal/config.json)")
     ap.add_argument("--scale", type=int, default=1, help="screenshot pixel scale, 2 for HiDPI")
     a = ap.parse_args()
-    global MASTHEAD
-    MASTHEAD = a.masthead
+    global CFG
+    CFG = settings.load(a.config)
+    if a.masthead is not None:
+        CFG["masthead_text"], CFG["masthead_image"] = a.masthead, ""
+    if a.masthead_image:
+        CFG["masthead_image"] = os.path.abspath(os.path.expanduser(a.masthead_image))
     today = dt.date.fromisoformat(a.today) if a.today else dt.date.today()
     cal = data.load()
     css()
