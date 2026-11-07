@@ -96,6 +96,8 @@ gtk-layer-shell (all installed: `gtk-layer-shell-0.10`, PyGObject Gtk 3). No new
 - Screenshots: `KCAL_CONFIG=/nonexistent ./kcal.py --screenshot screenshots/month.png --month 2026-08 --today 2026-08-17 --hover 2026-08-28 --scale 2`; `sway.png` is a grim capture of HDMI-A-1 top-right (880x680 from x=1040) on an empty workspace, SSID painted over.
 - Untested: focus-out close on a real X11 session, GNOME Wayland placement, Arch/Debian package names in install.sh.
 - Blog post: dracufolio `app/blog/(posts)/kerala-calendar-for-waybar/page.mdx`.
+- Published 2026-11-07 by the user: swaydots main e13aa6f (history rewritten, logo purged), branch `kcal`, dracufolio 06eb0e6.
+- Next (user, 2026-11-07): give the calendar its own repo so it can be starred. The user creates the repo and publishes the `kcal` branch as its `main`. Then: update the clone URL in `kcal/README.md` and in the blog post (Install section and last paragraph), add a LICENSE (ask, MIT suggested), give the user the command to delete the `kcal` branch from swaydots, and add a re-sync line here (split as above, then send `kcal` to the new repo's `main`). Still open: GitHub Support cached-views request for the old swaydots commits.
 - Next: user checks hover/click feel, external monitor, keyboard with the mouse elsewhere (keys follow focus).
 - Gotchas: officeholidays SUMMARY carries `LANGUAGE=en-us:` before the text; the feed has typos; Google ICS DTSTART comes in the `;VALUE=DATE:` form.
 - Kerala feed has no New Year (filled from Google) and lists Bakrid on 2 days in 2026 (27+28 May): only the first stays red (override in holidays-custom.json).
