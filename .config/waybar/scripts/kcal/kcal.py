@@ -33,6 +33,7 @@ CELL_W, CELL_H = 66, 62
 SIDE_W = 124
 LOGO = os.path.join(HERE, "assets", "mathrubhumi.png")
 LOGO_H = 88  # px; matches the ~87px mini month boxes beside it (ink is ~90% of the image height)
+MASTHEAD = None  # --masthead: a typed title instead of the logo (screenshots to share, no trademark)
 
 
 def label(text, *classes, xalign=None):
@@ -235,6 +236,8 @@ class Popup(Gtk.Window):
     def logo(self):
         """Masthead logo from assets/, drawn from a 2x surface so it stays sharp on HiDPI.
         Falls back to the typed wordmark when the file is missing."""
+        if MASTHEAD:
+            return label(MASTHEAD, "mast", xalign=0.5)
         try:
             from gi.repository import GdkPixbuf
             pb = GdkPixbuf.Pixbuf.new_from_file_at_scale(LOGO, -1, LOGO_H * 2, True)
@@ -680,7 +683,11 @@ def main():
     ap.add_argument("--month")
     ap.add_argument("--today")
     ap.add_argument("--hover", help="YYYY-MM-DD: also render that day's tooltip card (screenshot only)")
+    ap.add_argument("--masthead", help="typed title instead of the logo")
+    ap.add_argument("--scale", type=int, default=1, help="screenshot pixel scale, 2 for HiDPI")
     a = ap.parse_args()
+    global MASTHEAD
+    MASTHEAD = a.masthead
     today = dt.date.fromisoformat(a.today) if a.today else dt.date.today()
     cal = data.load()
     css()
@@ -725,6 +732,7 @@ def shot(a, cal, today):
     off.show_all()
     if a.hover:
         card = hover_card(pop, dt.date.fromisoformat(a.hover))
+        card.set_halign(Gtk.Align.START)  # natural width, as the real tooltip draws it
         off.remove(frame)
         wrap = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         wrap.pack_start(frame, True, True, 0)
@@ -734,8 +742,19 @@ def shot(a, cal, today):
     for _ in range(20):
         while Gtk.events_pending():
             Gtk.main_iteration()
-    pb = off.get_pixbuf()
-    pb.savev(a.screenshot, "png", [], [])
+    if a.scale == 1:
+        off.get_pixbuf().savev(a.screenshot, "png", [], [])
+        return 0
+    # Redraw the widget tree into a bigger surface, so text and lines are drawn at that
+    # resolution instead of a 1x pixbuf being upscaled.
+    import cairo
+    # The window, not its child, so the paper colour and the border come along.
+    al = off.get_allocation()
+    surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, al.width * a.scale, al.height * a.scale)
+    ctx = cairo.Context(surf)
+    ctx.scale(a.scale, a.scale)
+    off.draw(ctx)
+    surf.write_to_png(a.screenshot)
     return 0
 
 
