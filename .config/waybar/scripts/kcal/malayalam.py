@@ -123,3 +123,29 @@ def header_ml(year, month):
 def long_date_ml(d):
     y, m, k = kdate(d)
     return f"{month_name_ml(m)} {k}, {y}"
+
+
+WEEKDAYS_ML = ["ഞായർ", "തിങ്കൾ", "ചൊവ്വ", "ബുധൻ", "വ്യാഴം", "വെള്ളി", "ശനി"]  # Sunday first
+WEEKDAYS_ML_SHORT = ["ഞാ", "തി", "ചൊ", "ബു", "വ്യാ", "വെ", "ശ"]
+GREG_ML = ["ജനുവരി", "ഫെബ്രുവരി", "മാർച്ച്", "ഏപ്രിൽ", "മേയ്", "ജൂൺ", "ജൂലൈ", "ഓഗസ്റ്റ്",
+           "സെപ്റ്റംബർ", "ഒക്ടോബർ", "നവംബർ", "ഡിസംബർ"]
+
+
+def sun_times(d):
+    """('06:14', '18:02'): sunrise and sunset at Kochi, IST."""
+    def hm(h):
+        m = round(h * 60)
+        return f"{m // 60:02d}:{m % 60:02d}"
+    rise, sset = _sun_times(d)
+    return hm(rise), hm(sset)
+
+
+def month_starts(year, month):
+    """[(date, malayalam month number)] for each Malayalam month that starts in this Gregorian month."""
+    d, out = dt.date(year, month, 1), []
+    while d.month == month:
+        k = kdate(d)
+        if k[2] == 1:
+            out.append((d, k[1]))
+        d += dt.timedelta(days=1)
+    return out

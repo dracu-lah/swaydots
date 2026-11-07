@@ -3,3 +3,5 @@
 .config/lazygit
 .config/nvim
 .config/mimeapps.list
+__pycache__/
+*.pyc

@@ -1,52 +1,113 @@
-* { font-family: "JetBrainsMono Nerd Font", monospace; font-size: 14px; }
-window.kcal { background: #000000; color: #ffffff; border: 1px solid #3a3a3a; }
-.pad { padding: 12px; }
-.title { font-size: 18px; font-weight: bold; }
-.subtitle { color: #8a8a8a; font-size: 12px; }
-.foot { color: #bdbdbd; font-size: 12px; padding-top: 2px; }
-.legend { font-size: 11px; }
-.legend.lg-red { color: #b8423e; }
-.legend.lg-muted { color: #8a8a8a; }
-viewport, scrolledwindow { background: transparent; border: none; padding: 0; }
-.list .row { padding: 0; margin: 0; }
-.note { color: #8a8a8a; font-size: 12px; }
-button, combobox button { background: #141414; color: #ffffff; border: 1px solid #333333; border-radius: 4px;
-  padding: 2px 10px; box-shadow: none; background-image: none; min-height: 26px; }
-button:hover { background: #262626; }
-.nav { font-size: 18px; padding: 0 12px; }
-.wd { color: #bdbdbd; font-weight: bold; font-size: 12px; }
-.wd.red { color: #b8423e; }
-.cell { background: #0b0b0b; border-radius: 4px; }
-.cell:hover { background: #1c1c1c; }
-.cell .num { font-size: 20px; font-weight: bold; }
-.cell .ml { font-size: 11px; color: #8a8a8a; }
-.cell.red .num { color: #b8423e; }
-.cell.muted .num { color: #8a8a8a; }
-.cell .dot { color: #8a8a8a; font-size: 9px; }
-.cell.red .dot { color: #b8423e; }
-.cell.dim { opacity: 0.5; }
-.cell.sel { border: 1px solid #9a9a9a; }
-.cell.today { background: #333333; border: 1px solid #5a5a5a; }
-.cell.today:hover { background: #404040; }
-.cell.today .num { color: #ffffff; }
-.cell.today.red .num { color: #b8423e; }
-.cell.today .ml { color: #bdbdbd; }
-.cell.today .dot { color: #bdbdbd; }
-.cell.holiday:hover { background: #262626; }
-.list { border-top: 1px solid #262626; padding-top: 6px; }
-.list .row { font-size: 13px; }
-.rowbox { border-radius: 4px; padding: 2px 4px; }
-.rowbox:hover { background: #1c1c1c; }
-.rowbox:active { background: #2a2a2a; }
-.cell:active { background: #2e2e2e; }
-.list .row.red { color: #b8423e; }
-.list .row.muted { color: #8a8a8a; }
-.tip { background: #111111; color: #ffffff; border: 1px solid #3a3a3a; border-radius: 6px; padding: 8px 10px; }
-.tip .t-date { font-weight: bold; }
-.tip .t-ml { color: #bdbdbd; font-size: 12px; }
-.tip .t-red { color: #b8423e; font-weight: bold; }
-.tip .t-muted { color: #8a8a8a; font-weight: bold; }
-.tip .t-reason { color: #bdbdbd; font-size: 12px; }
-.tip .t-tent { color: #e0b341; font-size: 12px; }
+/* Paper wall-calendar look: off-white page, black ink, printed red. */
+* { font-family: "Adwaita Sans", "RIT Rachana", sans-serif; font-size: 12px; color: #141414; }
+window.kcal { background: #f6f3ec; border: 2px solid #141414; }
+window.kcal-backdrop { background: transparent; border: none; }
+.page { padding: 10px 12px 8px 12px; }
+
+/* masthead */
+.mast { font-family: "RIT Keraleeyam", "RIT Rachana", serif; font-weight: bold; font-size: 54px;
+  text-shadow: 0.7px 0 0 #141414, -0.7px 0 0 #141414, 0 0.7px 0 #141414; }
+.mini { border: 1px solid #141414; padding: 3px 4px; background: #f6f3ec; }
+.mini:hover { background: #ece7dc; }
+.mini:active { background: #e2dccd; }
+.mini-t { font-family: "RIT Rachana", serif; font-weight: bold; font-size: 10px; }
+.mini-h { font-family: "RIT Rachana", serif; font-size: 8px; color: #4a463e; }
+.mini-d { font-size: 8px; }
+.mini-h.red, .mini-d.red { color: #b3181e; }
+.mini-d.today { font-weight: 900; text-decoration: underline; }
+.strip { font-family: "RIT Rachana", serif; font-size: 10px; color: #2b2925; padding: 2px 0;
+  margin-top: 6px; border-top: 2px solid #141414; border-bottom: 1px solid #141414; }
+
+/* month bar */
+.monthbar { padding: 6px 0; border-bottom: 2px solid #141414; }
+.kyear { font-weight: 900; font-size: 15px; }
+.bullet { color: #b3181e; font-size: 13px; }
+.mname { font-family: "RIT Rachana", serif; font-weight: bold; font-size: 22px; }
+button { background: transparent; background-image: none; box-shadow: none; border: 1px solid transparent;
+  border-radius: 2px; padding: 0 6px; min-height: 24px; text-shadow: none; }
+button:hover { border-color: #141414; background: #ece7dc; }
+button:active, button:checked { background: #e2dccd; }
+.pick-l link { color: #141414; }
+.pick-l link:hover { color: #b3181e; }
+.pick-y link { color: #b3181e; }
+.pick-y link:hover { color: #6e0d11; }
+.pick-y { font-weight: 900; font-size: 20px; }
+.pick-m { font-weight: 900; font-size: 18px; letter-spacing: 0.5px; }
+.pick-menu menuitem label { font-weight: bold; }
+.nav, .nav label { font-size: 13px; color: #141414; padding: 0 10px; }
+.stamp { border: 1.5px solid #b3181e; color: #b3181e; padding: 0 8px; }
+.stamp label { color: #b3181e; font-weight: bold; font-size: 11px; }
+.stamp:hover { background: #b3181e; }
+.stamp:hover label { color: #f6f3ec; }
+.stamp:disabled { border-color: #cfc9bc; }
+.stamp:disabled label { color: #b5ae9f; }
+menu, .menu { background: #f6f3ec; border: 1px solid #141414; padding: 2px 0; }
+menuitem { padding: 2px 10px; }
+menuitem:hover { background: #141414; }
+menuitem:hover label { color: #f6f3ec; }
+.note { color: #6b665c; font-size: 11px; padding-top: 3px; }
+
+/* body */
+.body { padding-top: 6px; }
+.side { padding: 0 8px; }
+.side-r { border-left: 1px solid #cfc9bc; }
+.side:first-child { border-right: 1px solid #cfc9bc; }
+.sec { font-family: "RIT Rachana", serif; font-weight: bold; font-size: 12px; margin-top: 6px; }
+.sec.first { margin-top: 0; }
+.dcol { min-width: 42px; }
+.sec-en { font-size: 8px; letter-spacing: 1px; color: #6b665c; border-bottom: 1px solid #141414; padding-bottom: 2px;
+  margin-bottom: 2px; }
+.side-t { font-size: 10px; }
+.side-t.red { color: #b3181e; }
+.side-t.muted { color: #6b665c; }
+.side-t.mono { font-family: "JetBrainsMono Nerd Font", monospace; font-size: 9.5px; }
+.rowbox { padding: 1px 2px; border-radius: 2px; }
+.rowbox:hover { background: #ece7dc; }
+.rowbox:active { background: #e2dccd; }
+.hd { font-weight: 900; font-size: 12px; min-width: 16px; }
+.hd.red { color: #b3181e; }
+.hd.muted { color: #6b665c; }
+.hn { font-size: 10px; }
+.hn.muted { color: #6b665c; }
+
+/* grid */
+.grid { border-top: 1px solid #141414; border-left: 1px solid #141414; }
+.wdh { border-right: 1px solid #141414; border-bottom: 1px solid #141414; padding: 2px 0; background: #ece7dc; }
+.wdh.red { background: #b3181e; }
+.wd-ml { font-family: "RIT Rachana", serif; font-weight: bold; font-size: 12px; }
+.wd-en { font-size: 7.5px; letter-spacing: 1px; color: #4a463e; }
+.wdh.red .wd-ml, .wdh.red .wd-en { color: #f6f3ec; }
+.cell { background: #f6f3ec; border-right: 1px solid #141414; border-bottom: 1px solid #141414; }
+.cell:hover { background: #ece7dc; }
+.cell:active { background: #e2dccd; }
+.cell .num { font-weight: 900; font-size: 31px; letter-spacing: -1.5px; }
+.cell .ml { font-size: 8.5px; color: #6b665c; }
+.cell .sub { font-family: "RIT Rachana", "Adwaita Sans", sans-serif; font-size: 8px; color: #b3181e; }
+.cell.muted .sub { color: #6b665c; }
+.cell .sub.kstart { color: #141414; font-weight: bold; }
+.cell.red .num { color: #b3181e; }
+.cell.muted .num { color: #141414; }
+.cell .dot { color: #6b665c; font-size: 7px; }
+.cell.dim .num, .cell.dim .sub, .cell.dim .ml { opacity: 0.28; }
+.cell.sel { box-shadow: inset 0 0 0 2px #6b665c; }
+.cell.today { background: #141414; }
+.cell.today .num { color: #f6f3ec; }
+.cell.today.red .num { color: #ff8a80; }
+.cell.today .ml, .cell.today .dot { color: #b5ae9f; }
+.cell.today .sub { color: #ff8a80; }
+.cell.today .sub.kstart { color: #f6f3ec; }
+.cell.today:hover { background: #2b2925; }
+
+/* footer strip */
+.foot { font-size: 11px; color: #2b2925; padding-top: 4px; margin-top: 6px; border-top: 2px solid #141414; }
+
+/* tooltips */
 tooltip, tooltip.background { background: transparent; border: none; }
-.tip .t-hint { color: #8a8a8a; font-size: 11px; font-style: italic; }
+.tip { background: #fbf9f4; border: 1px solid #141414; border-radius: 0; padding: 8px 10px; }
+.tip .t-date { font-weight: bold; }
+.tip .t-ml { color: #4a463e; font-size: 12px; }
+.tip .t-red { color: #b3181e; font-weight: bold; }
+.tip .t-muted { color: #6b665c; font-weight: bold; }
+.tip .t-reason { color: #4a463e; font-size: 12px; }
+.tip .t-tent { color: #9a6b00; font-size: 12px; }
+.tip .t-hint { color: #6b665c; font-size: 11px; font-style: italic; }

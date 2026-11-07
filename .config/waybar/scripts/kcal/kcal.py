@@ -29,7 +29,10 @@ ZEN = os.path.expanduser("~/.local/opt/zen/zen")
 PID = os.path.join(os.environ.get("XDG_RUNTIME_DIR") or data.CACHE_DIR, "kcal.pid")
 MONTHS = list(calendar.month_name)[1:]
 WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
-CELL_W, CELL_H = 64, 56
+CELL_W, CELL_H = 66, 62
+SIDE_W = 124
+LOGO = os.path.join(HERE, "assets", "mathrubhumi.png")
+LOGO_H = 88  # px; matches the ~87px mini month boxes beside it (ink is ~90% of the image height)
 
 
 def label(text, *classes, xalign=None):
@@ -68,7 +71,6 @@ class Popup(Gtk.Window):
         self.sel = None
         self.layer = layer
         self.msg_id = 0
-        self.updating = False
         self.get_style_context().add_class("kcal")
         self.set_default_size(560, -1)
         self.set_resizable(False)
@@ -92,86 +94,196 @@ class Popup(Gtk.Window):
         L.set_margin(self, L.Edge.TOP, 6)
         L.set_margin(self, L.Edge.RIGHT, 6)
         L.set_keyboard_mode(self, L.KeyboardMode.ON_DEMAND)
+        self.make_backdrop(L)
+
+    def make_backdrop(self, L):
+        # Invisible full-screen surface under the popup: a click on it closes the popup.
+        bd = Gtk.Window(type=Gtk.WindowType.TOPLEVEL)
+        bd.set_app_paintable(True)
+        bd.set_visual(bd.get_screen().get_rgba_visual())
+        bd.get_style_context().add_class("kcal-backdrop")
+        L.init_for_window(bd)
+        L.set_namespace(bd, "kcal-backdrop")
+        L.set_layer(bd, L.Layer.TOP)
+        for e in (L.Edge.TOP, L.Edge.BOTTOM, L.Edge.LEFT, L.Edge.RIGHT):
+            L.set_anchor(bd, e, True)
+        L.set_exclusive_zone(bd, -1)
+        L.set_keyboard_mode(bd, L.KeyboardMode.NONE)
+        bd.add_events(Gdk.EventMask.BUTTON_PRESS_MASK)
+        bd.connect("button-press-event", lambda *_: self.close_popup())
+        bd.show_all()
+        self.backdrop = bd
 
     # ---- layout ----
     def build(self):
-        root = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
-        root.get_style_context().add_class("pad")
+        root = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+        root.get_style_context().add_class("page")
         self.add(root)
 
-        head = Gtk.Overlay()
-        tbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
-        self.title = label("", "title", xalign=0.5)
-        self.subtitle = label("", "subtitle", xalign=0.5)
-        tbox.pack_start(self.title, False, False, 0)
-        tbox.pack_start(self.subtitle, False, False, 0)
-        head.add(tbox)
-        self.today_btn = Gtk.Button(label="Today")
+        # masthead: mini prev month | wordmark | mini next month (like the paper's corner boxes)
+        mast = Gtk.Box(spacing=0)
+        self.mini_prev = self.make_mini(-1, "Previous month (PageUp)")
+        self.mini_next = self.make_mini(1, "Next month (PageDown)")
+        mid = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+        mid.set_valign(Gtk.Align.CENTER)
+        mid.pack_start(self.logo(), False, False, 0)
+        mast.pack_start(self.mini_prev["box"], False, False, 0)
+        mast.pack_end(self.mini_next["box"], False, False, 0)
+        mast.set_center_widget(mid)
+        root.pack_start(mast, False, False, 0)
+
+        self.strip = label("", "strip", xalign=0.5)
+        self.strip.set_ellipsize(Pango.EllipsizeMode.END)
+        root.pack_start(self.strip, False, False, 0)
+
+        # month bar: ‹  1202 ● നവംബർ [2026] [NOVEMBER]  › , Today at the end
+        bar = Gtk.Box(spacing=6)
+        bar.get_style_context().add_class("monthbar")
+        prev = self.nav_btn("◀", "Previous month (PageUp)", -1)
+        nxt = self.nav_btn("▶", "Next month (PageDown)", 1)
+        self.kyear = label("", "kyear")
+        self.mname = label("", "mname")
+        self.month_btn = self.pick_btn("pick-m", "Pick a month",
+                                       [(m.upper(), (lambda i: lambda *_: self.goto(self.year, i + 1))(i))
+                                        for i, m in enumerate(MONTHS)], cols=3)
+        self.year_btn = self.pick_btn("pick-y", "Pick a year",
+                                      [(str(y), (lambda y: lambda *_: self.goto(y, self.month))(y))
+                                       for y in range(2000, 2051)], cols=6)
+        c = Gtk.Box(spacing=6)
+        c.set_baseline_position(Gtk.BaselinePosition.CENTER)
+        for w in (self.kyear, label("◉", "bullet"), self.mname, self.year_btn, self.month_btn):
+            w.set_valign(Gtk.Align.BASELINE)
+            c.pack_start(w, False, False, 0)
+        self.today_btn = Gtk.Button(label="ഇന്ന് · Today")
+        self.today_btn.get_style_context().add_class("stamp")
         self.today_btn.set_focus_on_click(False)
         self.today_btn.set_tooltip_text("Jump to today (t)")
-        self.today_btn.set_halign(Gtk.Align.END)
-        self.today_btn.set_valign(Gtk.Align.CENTER)
         self.today_btn.connect("clicked", lambda *_: self.go_today())
-        head.add_overlay(self.today_btn)
-        root.pack_start(head, False, False, 0)
-
-        bar = Gtk.Box(spacing=6)
-        prev = Gtk.Button(label="‹")
-        prev.get_style_context().add_class("nav")
-        prev.set_focus_on_click(False)
-        prev.set_tooltip_text("Previous month (PageUp)")
-        prev.connect("clicked", lambda *_: self.shift(-1))
-        nxt = Gtk.Button(label="›")
-        nxt.get_style_context().add_class("nav")
-        nxt.set_focus_on_click(False)
-        nxt.set_tooltip_text("Next month (PageDown)")
-        nxt.connect("clicked", lambda *_: self.shift(1))
-        self.month_box = Gtk.ComboBoxText()
-        for m in MONTHS:
-            self.month_box.append_text(m)
-        self.year_box = Gtk.ComboBoxText()
-        for y in range(2000, 2051):
-            self.year_box.append_text(str(y))
-        self.month_box.connect("changed", self.on_pick)
-        self.year_box.connect("changed", self.on_pick)
-        mid = Gtk.Box(spacing=6)
-        mid.pack_start(self.month_box, False, False, 0)
-        mid.pack_start(self.year_box, False, False, 0)
+        self.today_btn.set_no_show_all(True)
         bar.pack_start(prev, False, False, 0)
         bar.pack_end(nxt, False, False, 0)
-        bar.set_center_widget(mid)
+        bar.pack_end(self.today_btn, False, False, 0)
+        bar.set_center_widget(c)
         root.pack_start(bar, False, False, 0)
 
-        self.note = label("", "note", xalign=0)
+        self.note = label("", "note", xalign=0.5)
         self.note.set_no_show_all(True)
         root.pack_start(self.note, False, False, 0)
 
-        grid = Gtk.Grid(column_spacing=2, row_spacing=2, column_homogeneous=True)
+        # body: holidays column | grid | Malayalam month, sun times, legend
+        body = Gtk.Box(spacing=0)
+        body.get_style_context().add_class("body")
+        self.left = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
+        self.left.get_style_context().add_class("side")
+        self.left.set_size_request(SIDE_W, -1)
+        self.right = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
+        self.right.get_style_context().add_class("side")
+        self.right.get_style_context().add_class("side-r")
+        self.right.set_size_request(SIDE_W, -1)
+        grid = Gtk.Grid(column_spacing=0, row_spacing=0, column_homogeneous=True)
+        grid.get_style_context().add_class("grid")
         for c, wd in enumerate(WEEKDAYS):
-            grid.attach(label(wd, "wd", *(["red"] if c == 0 else [])), c, 0, 1, 1)
+            h = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+            h.get_style_context().add_class("wdh")
+            if c == 0:
+                h.get_style_context().add_class("red")
+            h.pack_start(label(ml.WEEKDAYS_ML[c], "wd-ml"), False, False, 0)
+            h.pack_start(label(wd.upper(), "wd-en"), False, False, 0)
+            grid.attach(h, c, 0, 1, 1)
         for r in range(6):
             for c in range(7):
                 cell = self.make_cell()
                 grid.attach(cell["box"], c, r + 1, 1, 1)
                 self.cells[(r, c)] = cell
-        root.pack_start(grid, False, False, 0)
-
-        self.list_box = Gtk.Grid(column_spacing=12, row_spacing=2, column_homogeneous=True)
-        self.list_box.get_style_context().add_class("list")
-        sw = Gtk.ScrolledWindow()
-        sw.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
-        sw.set_propagate_natural_height(True)
-        sw.set_max_content_height(112)
-        sw.add(self.list_box)
-        root.pack_start(sw, False, False, 0)
+        body.pack_start(self.left, False, False, 0)
+        body.pack_start(grid, False, False, 0)
+        body.pack_start(self.right, False, False, 0)
+        root.pack_start(body, False, False, 0)
 
         self.foot = label("", "foot", xalign=0.5)
+        self.foot.set_ellipsize(Pango.EllipsizeMode.END)
         root.pack_start(self.foot, False, False, 0)
-        legend = Gtk.Box(spacing=14)
-        legend.set_halign(Gtk.Align.CENTER)
-        for txt, cls in (("■ holiday", "lg-red"), ("● gazette day", "lg-muted"), ("~ moon-dependent", "lg-muted")):
-            legend.pack_start(label(txt, "legend", cls), False, False, 0)
-        root.pack_start(legend, False, False, 0)
+
+    def pick_btn(self, cls, tip, items, cols):
+        """Printed-looking value that opens a grid menu of choices. A plain Label with a markup link,
+        set straight in the month bar: Button, MenuButton and EventBox all drop the shared baseline."""
+        lb = Gtk.Label()
+        lb.get_style_context().add_class("pick-l")
+        lb.get_style_context().add_class(cls)
+        lb.set_tooltip_text(tip)
+        lb.set_track_visited_links(False)
+        menu = Gtk.Menu()
+        menu.get_style_context().add_class("pick-menu")
+        for i, (txt, cb) in enumerate(items):
+            it = Gtk.MenuItem(label=txt)
+            it.connect("activate", cb)
+            menu.attach(it, i % cols, i % cols + 1, i // cols, i // cols + 1)
+        menu.show_all()
+        menu.attach_to_widget(lb, None)
+
+        def pop(w, _uri):
+            menu.popup_at_widget(w, Gdk.Gravity.SOUTH_WEST, Gdk.Gravity.NORTH_WEST, Gtk.get_current_event())
+            return True
+        lb.connect("activate-link", pop)
+
+        def set_text(t):
+            lb.set_markup(f'<a href="pick"><span underline="none">{GLib.markup_escape_text(t)}</span></a>'
+                          '<span size="60%" foreground="#8a8478" rise="1500"> ▾</span>')
+        lb.set_value = set_text
+        return lb
+
+    def logo(self):
+        """Masthead logo from assets/, drawn from a 2x surface so it stays sharp on HiDPI.
+        Falls back to the typed wordmark when the file is missing."""
+        try:
+            from gi.repository import GdkPixbuf
+            pb = GdkPixbuf.Pixbuf.new_from_file_at_scale(LOGO, -1, LOGO_H * 2, True)
+            if pb.get_has_alpha() and pb.get_n_channels() == 4:
+                # The source has faint alpha haze (1..15) over its background: clear it at load time
+                # (the file stays untouched) so no pale box shows on the paper colour.
+                px = bytearray(pb.get_pixels())
+                px[3::4] = bytes(px[3::4]).translate(bytes(0 if i < 16 else i for i in range(256)))
+                pb = GdkPixbuf.Pixbuf.new_from_bytes(GLib.Bytes.new(bytes(px)), pb.get_colorspace(), True, 8,
+                                                     pb.get_width(), pb.get_height(), pb.get_rowstride())
+            surf = Gdk.cairo_surface_create_from_pixbuf(pb, 2, None)
+            img = Gtk.Image.new_from_surface(surf)
+            img.get_style_context().add_class("logo")
+            img.set_tooltip_text(None)
+            return img
+        except GLib.Error:
+            return label("കേരള കലണ്ടർ", "mast", xalign=0.5)
+
+    def nav_btn(self, txt, tip, step):
+        b = Gtk.Button(label=txt)
+        b.get_style_context().add_class("nav")
+        b.set_focus_on_click(False)
+        b.set_tooltip_text(tip)
+        b.connect("clicked", lambda *_: self.shift(step))
+        return b
+
+    def make_mini(self, step, tip):
+        eb = Gtk.EventBox()
+        eb.get_style_context().add_class("mini")
+        eb.set_size_request(SIDE_W, -1)
+        eb.set_valign(Gtk.Align.CENTER)
+        v = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=1)
+        title = label("", "mini-t", xalign=0.5)
+        g = Gtk.Grid(column_homogeneous=True)
+        for c, s in enumerate(ml.WEEKDAYS_ML_SHORT):
+            g.attach(label(s, "mini-h", *(["red"] if c == 0 else [])), c, 0, 1, 1)
+        days = []
+        for r in range(6):
+            for c in range(7):
+                lb = label("", "mini-d")
+                g.attach(lb, c, r + 1, 1, 1)
+                days.append(lb)
+        v.pack_start(title, False, False, 0)
+        v.pack_start(g, False, False, 0)
+        eb.add(v)
+        eb.set_tooltip_text(tip)
+        eb.connect("enter-notify-event", lambda w, _e: set_pointer(w, True))
+        eb.connect("button-release-event", lambda _w, ev: ev.button == 1 and self.shift(step))
+        return {"box": eb, "title": title, "days": days, "step": step}
 
     def make_cell(self):
         box = Gtk.EventBox()
@@ -180,21 +292,31 @@ class Popup(Gtk.Window):
         ov = Gtk.Overlay()
         num = label("", "num")
         num.set_halign(Gtk.Align.CENTER)
-        num.set_valign(Gtk.Align.CENTER)
+        num.set_valign(Gtk.Align.START)
+        num.set_margin_top(4)
         mal = label("", "ml")
         mal.set_halign(Gtk.Align.END)
-        mal.set_valign(Gtk.Align.END)
+        mal.set_valign(Gtk.Align.START)
         mal.set_margin_end(4)
+        mal.set_margin_top(2)
         dot = label("●", "dot")
         dot.set_halign(Gtk.Align.START)
         dot.set_valign(Gtk.Align.START)
-        dot.set_margin_start(5)
-        dot.set_margin_top(3)
+        dot.set_margin_start(4)
+        dot.set_margin_top(2)
+        sub = label("", "sub")
+        sub.set_halign(Gtk.Align.FILL)
+        sub.set_valign(Gtk.Align.END)
+        sub.set_margin_bottom(3)
+        sub.set_margin_start(2)
+        sub.set_margin_end(2)
+        sub.set_ellipsize(Pango.EllipsizeMode.END)
+        sub.set_max_width_chars(1)
         ov.add(num)
-        ov.add_overlay(mal)
-        ov.add_overlay(dot)
+        for w in (mal, dot, sub):
+            ov.add_overlay(w)
         box.add(ov)
-        cell = {"box": box, "num": num, "ml": mal, "dot": dot, "date": None}
+        cell = {"box": box, "num": num, "ml": mal, "dot": dot, "sub": sub, "date": None}
         box.set_has_tooltip(True)
         box.connect("query-tooltip", self.on_tip, cell)
         box.connect("button-release-event", self.on_click, cell)
@@ -219,7 +341,7 @@ class Popup(Gtk.Window):
         else:
             for c in self.cells.values():
                 self.set_cls(c["box"], "sel", c["date"] == d)
-            self.today_btn.set_sensitive(True)
+            self.today_btn.set_visible(d != self.today)
             self.update_foot()
 
     def find_next(self):
@@ -269,13 +391,6 @@ class Popup(Gtk.Window):
         if 2000 <= y <= 2050:
             self.goto(y, m + 1)
 
-    def on_pick(self, *_):
-        if self.updating:
-            return
-        m, y = self.month_box.get_active(), self.year_box.get_active()
-        if m >= 0 and y >= 0:
-            self.goto(2000 + y, m + 1)
-
     def on_scroll(self, _w, ev):
         if ev.direction == Gdk.ScrollDirection.UP:
             self.shift(-1)
@@ -312,6 +427,9 @@ class Popup(Gtk.Window):
         return False
 
     def close_popup(self):
+        bd = getattr(self, "backdrop", None)
+        if bd:
+            bd.destroy()
         self.destroy()
         Gtk.main_quit()
 
@@ -321,13 +439,15 @@ class Popup(Gtk.Window):
 
     def render(self):
         y, m = self.year, self.month
-        self.updating = True
-        self.month_box.set_active(m - 1)
-        self.year_box.set_active(y - 2000)
-        self.updating = False
-        self.title.set_text(ml.header_ml(y, m))
-        self.subtitle.set_text(f"{ml.header(y, m)}  ·  {MONTHS[m - 1]} {y}")
-        self.today_btn.set_sensitive((y, m) != (self.today.year, self.today.month) or self.sel not in (None, self.today))
+        self.month_btn.set_value(MONTHS[m - 1].upper())
+        self.year_btn.set_value(str(y))
+        first = dt.date(y, m, 1)
+        self.kyear.set_text(str(ml.kdate(first)[0]))
+        self.mname.set_text(ml.GREG_ML[m - 1])
+        n_red = sum(1 for _d, h in self.cal.month_list(y, m) if h["red"])
+        self.strip.set_text(f"കേരള സർക്കാർ ഗസറ്റ് അവധി കലണ്ടർ  ·  {ml.header_ml(y, m)}  ·  {ml.header(y, m)}  ·  "
+                            f"{n_red} {'അവധി' if n_red == 1 else 'അവധികൾ'} / holidays")
+        self.today_btn.set_visible((y, m) != (self.today.year, self.today.month) or self.sel not in (None, self.today))
         has_year = any(k.startswith(str(y)) for k in self.cal.days)
         if y in self.cal.kyears:
             self.note.set_text("")
@@ -336,19 +456,33 @@ class Popup(Gtk.Window):
         else:
             self.note.set_text(f"no holiday data for {y}")
         self.note.set_visible(bool(self.note.get_text()))
-        first = dt.date(y, m, 1)
         start = first - dt.timedelta(days=(first.weekday() + 1) % 7)  # Sunday first
         for r in range(6):
             for c in range(7):
                 self.fill(self.cells[(r, c)], start + dt.timedelta(days=r * 7 + c), m)
-        self.fill_list()
+        for mini in (self.mini_prev, self.mini_next):
+            i = y * 12 + m - 1 + mini["step"]
+            self.fill_mini(mini, i // 12, i % 12 + 1)
+        self.fill_left()
+        self.fill_right()
         self.update_foot()
 
     def fill(self, cell, d, month):
         info = self.cal.info(d)
         cell["date"], cell["info"] = d, info
+        k = ml.kdate(d)
         cell["num"].set_text(str(d.day))
-        cell["ml"].set_text(str(ml.day_number(d)))
+        cell["ml"].set_text(str(k[2]))
+        hs = sorted(info["holidays"], key=lambda h: not h["red"])
+        if hs:
+            sub = hs[0]["name"] + (" ~" if hs[0]["tentative"] else "")
+        elif info["sat"]:
+            sub = info["sat"]
+        elif k[2] == 1:
+            sub = f"{ml.month_name_ml(k[1])} 1"
+        else:
+            sub = ""
+        cell["sub"].set_text(sub)
         box = cell["box"]
         self.set_cls(box, "dim", d.month != month)
         self.set_cls(box, "today", d == self.today)
@@ -356,28 +490,78 @@ class Popup(Gtk.Window):
         self.set_cls(box, "red", info["red"])
         self.set_cls(box, "muted", info["muted"])
         self.set_cls(box, "holiday", bool(info["holidays"]))
-        cell["dot"].set_visible(info["muted"])
+        self.set_cls(cell["sub"], "kstart", not hs and not info["sat"] and k[2] == 1)
         cell["dot"].set_no_show_all(True)
         cell["dot"].set_visible(info["muted"])
 
-    def fill_list(self):
-        for ch in self.list_box.get_children():
-            self.list_box.remove(ch)
-        items = self.cal.month_list(self.year, self.month)
+    def fill_mini(self, mini, y, m):
+        mini["title"].set_text(f"{ml.GREG_ML[m - 1]} {y}")
+        first = dt.date(y, m, 1)
+        lead = (first.weekday() + 1) % 7
+        days = calendar.monthrange(y, m)[1]
+        for i, lb in enumerate(mini["days"]):
+            n = i - lead + 1
+            lb.set_text(str(n) if 1 <= n <= days else "")
+            red = 1 <= n <= days and self.cal.info(dt.date(y, m, n))["red"]
+            self.set_cls(lb, "red", bool(red))
+            self.set_cls(lb, "today", 1 <= n <= days and dt.date(y, m, n) == self.today)
+
+    def side_head(self, box, ml_txt, en_txt):
+        box.pack_start(label(ml_txt, "sec", *([] if box.get_children() else ["first"]), xalign=0), False, False, 0)
+        box.pack_start(label(en_txt, "sec-en", xalign=0), False, False, 0)
+
+    def fill_left(self):
+        for ch in self.left.get_children():
+            self.left.remove(ch)
+        self.side_head(self.left, "അവധി ദിനങ്ങൾ", "HOLIDAYS")
+        items = sorted(self.cal.month_list(self.year, self.month), key=lambda it: it[0])
         if not items:
-            self.list_box.attach(label("No gazette holidays this month", "note", xalign=0), 0, 0, 2, 1)
-        for i, (d, h) in enumerate(items):
-            txt = f"{d.day:>2} {d.strftime('%a')}  {h['name']}" + (" ~" if h["tentative"] else "")
-            row = label(txt, "row", "red" if h["red"] else "muted", xalign=0)
-            row.set_ellipsize(Pango.EllipsizeMode.END)
+            self.left.pack_start(label("ഈ മാസം ഗസറ്റ് അവധി ഇല്ല\nNo gazette holidays", "side-t", xalign=0),
+                                 False, False, 0)
+        for d, h in items:
+            row = Gtk.Box(spacing=5)
+            row.pack_start(label(str(d.day), "hd", "red" if h["red"] else "muted", xalign=1), False, False, 0)
+            name = label(h["name"] + (" ~" if h["tentative"] else ""), "hn", *([] if h["red"] else ["muted"]), xalign=0)
+            name.set_line_wrap(True)
+            name.set_line_wrap_mode(Pango.WrapMode.WORD_CHAR)
+            name.set_max_width_chars(14)
+            row.pack_start(name, True, True, 0)
             eb = Gtk.EventBox()
             eb.get_style_context().add_class("rowbox")
             eb.add(row)
-            eb.set_tooltip_text(h["name"] + (" (tentative)" if h["tentative"] else "") + "\nClick to search")
+            eb.set_tooltip_text(f"{d.strftime('%a %d %b')} · {h['name']}"
+                                + (" (tentative)" if h["tentative"] else "") + "\nClick to search")
             eb.connect("enter-notify-event", lambda w, _e: set_pointer(w, True))
             eb.connect("button-release-event", self.on_row_click, h, d.year)
-            self.list_box.attach(eb, i % 2, i // 2, 1, 1)
-        self.list_box.show_all()
+            self.left.pack_start(eb, False, False, 0)
+        self.left.show_all()
+
+    def fill_right(self):
+        for ch in self.right.get_children():
+            self.right.remove(ch)
+        y, m = self.year, self.month
+        self.side_head(self.right, "മലയാള മാസം", "MALAYALAM MONTH")
+        last = calendar.monthrange(y, m)[1]
+        rows = [(dt.date(y, m, 1), False)] + [(d, True) for d, _k in ml.month_starts(y, m) if d.day != 1]
+        rows += [(dt.date(y, m, last), False)]
+        for d, start in rows:
+            k = ml.kdate(d)
+            cls = [] if start or k[2] == 1 else ["muted"]
+            row = Gtk.Box(spacing=5)
+            row.pack_start(label(f"{d.day} {d.strftime('%b')}", "side-t", "dcol", *cls, xalign=1), False, False, 0)
+            row.pack_start(label(f"{ml.month_name_ml(k[1])} {k[2]}", "side-t", *cls, xalign=0), False, False, 0)
+            self.right.pack_start(row, False, False, 0)
+        self.side_head(self.right, "ഉദയം · അസ്തമയം", "SUN · KOCHI")
+        for day in (1, 8, 15, 22, 29):
+            if day <= last:
+                rise, sset = ml.sun_times(dt.date(y, m, day))
+                self.right.pack_start(label(f"{day:>2}   ↑{rise}  ↓{sset}", "side-t", "mono", xalign=0),
+                                      False, False, 0)
+        self.side_head(self.right, "സൂചന", "KEY")
+        for txt, cls in (("■ അവധി  holiday", "red"), ("● ഗസറ്റ് ദിനം  gazette", "muted"),
+                         ("~ ചന്ദ്രദർശനം  moon", "muted"), ("↗ മലയാള തീയതി  ME day", "muted")):
+            self.right.pack_start(label(txt, "side-t", cls, xalign=0), False, False, 0)
+        self.right.show_all()
 
     # ---- interaction ----
     def on_tip(self, _w, _x, _y, _kb, tip, cell):
@@ -529,6 +713,7 @@ def main():
 def shot(a, cal, today):
     """Render the popup content offscreen to a PNG."""
     off = Gtk.OffscreenWindow()
+    off.get_style_context().add_class("kcal")
     pop = Popup(cal, today, month_arg(a.month, today), layer=False)
     child = pop.get_child()
     pop.remove(child)
@@ -536,7 +721,7 @@ def shot(a, cal, today):
     frame.get_style_context().add_class("kcal")
     frame.pack_start(child, True, True, 0)
     off.add(frame)
-    off.set_default_size(560, -1)
+    off.set_default_size(-1, -1)
     off.show_all()
     if a.hover:
         card = hover_card(pop, dt.date.fromisoformat(a.hover))
