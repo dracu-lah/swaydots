@@ -93,7 +93,7 @@ gtk-layer-shell (all installed: `gtk-layer-shell-0.10`, PyGObject Gtk 3). No new
 
 - Re-sync the `kcal` branch after changing the folder on main (no `git subtree` on this Fedora): `rm -rf /tmp/kcal-split && git clone -q --no-local . /tmp/kcal-split && git -C /tmp/kcal-split filter-repo --force --subdirectory-filter .config/waybar/scripts/kcal && git fetch -f /tmp/kcal-split main:kcal`. The branch fast-forwards while main's history stays linear.
 - Blog post updated the same day (dracufolio 06eb0e6): Sway screenshot `public/appwrite/blog/kerala-calendar-on-sway.webp` (lossless, 1280x1010 from a 1.5x capture).
-- Screenshots: `KCAL_CONFIG=/nonexistent ./kcal.py --screenshot screenshots/month.png --month 2026-08 --today 2026-08-17 --hover 2026-08-28 --scale 2`; `sway.png` is a grim capture of HDMI-A-1 top-right (880x680 from x=1040) on an empty workspace, SSID painted over.
+- README cards: `screenshots/make-cards.py` composes hero.png (sway.png + month.png) and mastheads.png (text and image strips rendered to /tmp, top 270px of a --scale 2 shot) on a generated red gradient. Screenshots: `KCAL_CONFIG=/nonexistent ./kcal.py --screenshot screenshots/month.png --month 2026-08 --today 2026-08-17 --hover 2026-08-28 --scale 2`; `sway.png` is a grim capture of HDMI-A-1 top-right (880x680 from x=1040) on an empty workspace, SSID painted over.
 - Untested: focus-out close on a real X11 session, GNOME Wayland placement, Arch/Debian package names in install.sh.
 - Blog post: dracufolio `app/blog/(posts)/kerala-calendar-for-waybar/page.mdx`.
 - Published 2026-11-07 by the user: swaydots main e13aa6f (history rewritten, logo purged), branch `kcal`, dracufolio 06eb0e6.

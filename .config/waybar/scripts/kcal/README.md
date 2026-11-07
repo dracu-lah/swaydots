@@ -4,9 +4,10 @@ A paper wall-calendar popup with Kerala government holidays, the Malayalam (Koll
 day, and sunrise and sunset in Kochi. It opens from a bar click or a key. It is Python and GTK 3, with no
 pip packages.
 
-![kcal open over Waybar on Sway](screenshots/sway.png)
-
-<p align="center"><img src="screenshots/month.png" width="640" alt="August 2026 with the hover card for 28 August"></p>
+<p align="center">
+  <img src="screenshots/hero.png" width="860" alt="Left: kcal open under the Waybar clock on Sway, November 2026. Right: August 2026 with the hover card for 28 August">
+  <br><sub>On Sway under the Waybar clock, and August with a day's hover card. Full size: <a href="screenshots/sway.png">Sway</a>, <a href="screenshots/month.png">month</a>.</sub>
+</p>
 
 ## Features
 
@@ -93,9 +94,10 @@ to change the month, **t** to jump to today, **Enter** to search the selected ho
 | `search_command` | A browser command for a holiday click, with `{query}` filled in, e.g. `["firefox", "--search", "{query}"]`. If empty, `search_url` opens in your default browser. |
 | `search_url` | The search engine URL, with `{query}` filled in. |
 
-| Text masthead | Image masthead ([example SVG](examples/masthead.svg)) |
-| --- | --- |
-| ![](screenshots/masthead-text.png) | ![](screenshots/masthead-image.png) |
+<p align="center">
+  <img src="screenshots/mastheads.png" width="620" alt="The masthead with the typed title ഓഫീസ് കലണ്ടർ, and with an example image logo that reads Team Calendar">
+  <br><sub>A text masthead, and an image one using the <a href="examples/masthead.svg">example SVG</a>.</sub>
+</p>
 
 `--masthead "Title"` and `--masthead-image file.png` override the config for one run.
 
