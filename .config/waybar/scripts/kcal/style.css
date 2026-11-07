@@ -1,0 +1,52 @@
+* { font-family: "JetBrainsMono Nerd Font", monospace; font-size: 14px; }
+window.kcal { background: #000000; color: #ffffff; border: 1px solid #3a3a3a; }
+.pad { padding: 12px; }
+.title { font-size: 18px; font-weight: bold; }
+.subtitle { color: #8a8a8a; font-size: 12px; }
+.foot { color: #bdbdbd; font-size: 12px; padding-top: 2px; }
+.legend { font-size: 11px; }
+.legend.lg-red { color: #b8423e; }
+.legend.lg-muted { color: #8a8a8a; }
+viewport, scrolledwindow { background: transparent; border: none; padding: 0; }
+.list .row { padding: 0; margin: 0; }
+.note { color: #8a8a8a; font-size: 12px; }
+button, combobox button { background: #141414; color: #ffffff; border: 1px solid #333333; border-radius: 4px;
+  padding: 2px 10px; box-shadow: none; background-image: none; min-height: 26px; }
+button:hover { background: #262626; }
+.nav { font-size: 18px; padding: 0 12px; }
+.wd { color: #bdbdbd; font-weight: bold; font-size: 12px; }
+.wd.red { color: #b8423e; }
+.cell { background: #0b0b0b; border-radius: 4px; }
+.cell:hover { background: #1c1c1c; }
+.cell .num { font-size: 20px; font-weight: bold; }
+.cell .ml { font-size: 11px; color: #8a8a8a; }
+.cell.red .num { color: #b8423e; }
+.cell.muted .num { color: #8a8a8a; }
+.cell .dot { color: #8a8a8a; font-size: 9px; }
+.cell.red .dot { color: #b8423e; }
+.cell.dim { opacity: 0.5; }
+.cell.sel { border: 1px solid #9a9a9a; }
+.cell.today { background: #333333; border: 1px solid #5a5a5a; }
+.cell.today:hover { background: #404040; }
+.cell.today .num { color: #ffffff; }
+.cell.today.red .num { color: #b8423e; }
+.cell.today .ml { color: #bdbdbd; }
+.cell.today .dot { color: #bdbdbd; }
+.cell.holiday:hover { background: #262626; }
+.list { border-top: 1px solid #262626; padding-top: 6px; }
+.list .row { font-size: 13px; }
+.rowbox { border-radius: 4px; padding: 2px 4px; }
+.rowbox:hover { background: #1c1c1c; }
+.rowbox:active { background: #2a2a2a; }
+.cell:active { background: #2e2e2e; }
+.list .row.red { color: #b8423e; }
+.list .row.muted { color: #8a8a8a; }
+.tip { background: #111111; color: #ffffff; border: 1px solid #3a3a3a; border-radius: 6px; padding: 8px 10px; }
+.tip .t-date { font-weight: bold; }
+.tip .t-ml { color: #bdbdbd; font-size: 12px; }
+.tip .t-red { color: #b8423e; font-weight: bold; }
+.tip .t-muted { color: #8a8a8a; font-weight: bold; }
+.tip .t-reason { color: #bdbdbd; font-size: 12px; }
+.tip .t-tent { color: #e0b341; font-size: 12px; }
+tooltip, tooltip.background { background: transparent; border: none; }
+.tip .t-hint { color: #8a8a8a; font-size: 11px; font-style: italic; }

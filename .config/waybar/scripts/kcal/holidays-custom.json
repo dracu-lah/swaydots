@@ -1,0 +1,8 @@
+{
+  "_help": "Wins over both feeds. add: [{date, name, red, reason}]. remove: [{date, contains}]. rename: [{date, contains, to}]. force_red: [{date, contains}]. force_muted: [{date, contains}].",
+  "add": [],
+  "remove": [],
+  "rename": [],
+  "force_red": [],
+  "force_muted": []
+}

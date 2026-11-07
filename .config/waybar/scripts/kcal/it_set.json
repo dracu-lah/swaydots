@@ -1,0 +1,17 @@
+[
+  {"id": "newyear", "label": "New Year", "kerala": ["newyear"], "google": ["newyearsday"]},
+  {"id": "republic", "label": "Republic Day", "kerala": ["republicday"], "google": ["republicday"]},
+  {"id": "vishu", "label": "Vishu", "kerala": ["vishu"], "google": ["vishu"]},
+  {"id": "mayday", "label": "May Day", "kerala": ["labourday", "mayday"], "google": ["labourday", "mayday"]},
+  {"id": "independence", "label": "Independence Day", "kerala": ["independenceday"], "google": ["independenceday"]},
+  {"id": "firstonam", "label": "First Onam", "kerala": ["firstonam"], "google": [], "derive": {"from": "thiruvonam", "offset": -1}},
+  {"id": "thiruvonam", "label": "Thiruvonam", "kerala": ["thiruvonam"], "google": ["onam"]},
+  {"id": "gandhi", "label": "Gandhi Jayanti", "kerala": ["gandhi"], "google": ["gandhi"]},
+  {"id": "mahanavami", "label": "Mahanavami", "kerala": ["mahanavami"], "google": ["mahanavami"]},
+  {"id": "vijayadashami", "label": "Vijayadashami", "kerala": ["vijaya"], "google": ["dussehra"]},
+  {"id": "deepavali", "label": "Deepavali", "kerala": ["deepavali", "diwali"], "google": ["deepavali", "diwali"]},
+  {"id": "christmas", "label": "Christmas", "kerala": ["christmas"], "google": ["christmas"], "exclude": ["eve"]},
+  {"id": "eidfitr", "label": "Eid ul-Fitr", "kerala": ["idulfitr", "eidulfitr", "eidalfitr"], "google": ["idulfitr", "eidulfitr", "eidalfitr"], "tentative": true},
+  {"id": "bakrid", "label": "Bakrid", "kerala": ["iduladha", "eiduladha", "idulazha", "bakrid"], "google": ["bakrid", "eidaladha"], "tentative": true},
+  {"id": "goodfriday", "label": "Good Friday", "kerala": ["goodfriday"], "google": ["goodfriday"]}
+]

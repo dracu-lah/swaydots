@@ -21,7 +21,7 @@
     "disk",
     "temperature",
 
-    "clock",
+    "custom/clock",
     "battery",
     "tray",
     "custom/wf-recorder-status"
@@ -101,10 +101,11 @@
     "tooltip": false
   },
 
-  "clock": {
-    "format": "{:%H:%M %d/%m/%Y}",
-    "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
-    "on-click": ""
+  "custom/clock": {
+    "exec": "~/.config/waybar/scripts/clock.sh",
+    "return-type": "json",
+    "interval": 30,
+    "on-click": "~/.config/waybar/scripts/kcal/kcal.py --toggle"
   },
 
   "tray": {

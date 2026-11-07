@@ -137,6 +137,7 @@ bindsym --locked XF86MonBrightnessDown exec $scripts/osd.sh brightness down
 ## Power
 bindsym $mod+Shift+p exec $scripts/power-profile.sh
 bindsym $mod+Shift+b exec ~/.config/waybar/scripts/battery-info.sh
+bindsym $mod+Shift+d exec ~/.config/waybar/scripts/kcal/kcal.py --toggle
 bindsym $mod+x exec waylogout \
     --hide-cancel \
     --screenshots \
