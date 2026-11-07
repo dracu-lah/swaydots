@@ -30,7 +30,7 @@ set $menu wofi --show drun
 
 # Paths
 set $scripts ~/.config/sway/scripts
-set $wallpaper ~/wallpapers/wallpaper.jpg
+set $wallpaper ~/wallpapers/wallpaper.webp
 set $lock swaylock -f -i $wallpaper
 
 include /etc/sway/config-vars.d/*
