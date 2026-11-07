@@ -26,7 +26,7 @@ pip packages.
 ## Install
 
 ```bash
-git clone -b kcal --single-branch https://github.com/dracu-lah/swaydots.git ~/.local/share/kcal
+git clone https://github.com/dracu-lah/kerala-calendar.git ~/.local/share/kcal
 ~/.local/share/kcal/install.sh
 ```
 
@@ -120,5 +120,5 @@ KCAL_NO_LAYER=1 ./kcal.py --toggle                                             #
 
 ---
 
-Part of [swaydots](https://github.com/dracu-lah/swaydots), where it lives at `.config/waybar/scripts/kcal`.
-The `kcal` branch is that folder split out on its own.
+Made in [swaydots](https://github.com/dracu-lah/swaydots), where it lives at `.config/waybar/scripts/kcal`.
+This repo is that folder with its history. MIT licensed, see [LICENSE](LICENSE).
